@@ -2,11 +2,11 @@
 import { schedule } from "node-cron";
 import { Telegraf } from "telegraf";
 import { message, callbackQuery } from "telegraf/filters";
-import { Firestore } from "@google-cloud/firestore";
 // Утилиты для работы с ботом.
 import Context from "./context";
 import messageManager from "./utils/messageManager";
 import firestoreMiddleware from "./utils/middleware";
+import { sessionsCollection, usersCollection } from "./utils/database";
 // Команды бота.
 import commandAuth from "./methods/command.auth";
 import commandStart from "./methods/command.start";
@@ -20,21 +20,21 @@ import calendarInfo from "./messages/calendarInfo";
 // Синхронизация календаря и обновление студентов.
 import synchronizeCalendar, { updateStudentList } from "./synchronizeCalendar";
 
-// Инициализация бота и базы данных.
-const db = new Firestore({ keyFilename: "token.json" });
+// Инициализация бота.
 const token = process.env.BOT_TOKEN;
 if (!token) throw new Error("BOT_TOKEN is not defined!");
+
 const bot = new Telegraf<Context>(token);
 
 // Подгружаем данные из базы данных
 bot.use(
   // Сессия
-  firestoreMiddleware(db.collection("sessions"), {
+  firestoreMiddleware(sessionsCollection, {
     name: "session",
     defaultValue: { state: "", recentMessageIds: [], commandMessageIds: [] },
   }),
   // Пользователь
-  firestoreMiddleware(db.collection("users"), {
+  firestoreMiddleware(usersCollection, {
     name: "user",
     defaultValue: { lastScheduleUpdate: null, hasEnteredEmail: false },
   })
@@ -59,7 +59,9 @@ bot.catch((err, ctx) => {
 });
 
 // Запускаем бота
-bot.launch();
+const port = parseInt(process.env.PORT ?? "");
+const domain = process.env.DOMAIN;
+bot.launch(!domain || !port ? {} : { webhook: { domain, port } });
 console.log("bot started");
 
 // Запускаем синхронизацию
