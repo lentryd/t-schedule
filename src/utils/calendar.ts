@@ -95,6 +95,7 @@ export async function listEvent(calendarId: string, start?: Date, end?: Date) {
   }
   if (!end) {
     end = new Date(start);
+    end.setDate(end.getDate() + 1);
     end.setMonth(end.getMonth() + 1);
   }
 
