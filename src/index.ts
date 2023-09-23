@@ -61,16 +61,14 @@ bot.catch((err, ctx) => {
 // Запускаем бота
 const port = parseInt(process.env.PORT ?? "");
 const domain = process.env.DOMAIN;
-bot.launch(!domain || !port ? {} : { webhook: { domain, port } });
+bot.launch(
+  !domain || !port ? {} : { webhook: { domain, port, hookPath: "/bot" } }
+);
 console.log("bot started");
 
 // Запускаем синхронизацию
-schedule("*/5 * * * *", () => {
+schedule("* * * * *", () => {
   console.log("start synchronize");
   synchronizeCalendar().catch((err) => console.error(err));
   updateStudentList().catch((err) => console.error(err));
 });
-
-// Enable graceful stop
-process.once("SIGINT", () => bot.stop("SIGINT"));
-process.once("SIGTERM", () => bot.stop("SIGTERM"));
