@@ -5,7 +5,7 @@ import { fmt, code } from "telegraf/format";
 import Wrapper from "../utils/wrapper";
 import { CommandContext } from "../context";
 import { updateStudentList } from "../synchronizeCalendar";
-import { createCalendar } from "../utils/calendar";
+import { createCalendar, createRule } from "../utils/calendar";
 import calendarInfo from "../messages/calendarInfo";
 import messageManager from "../utils/messageManager";
 import { providersCollection, studentList } from "../utils/database";
@@ -55,18 +55,20 @@ export default async function commandAuth(ctx: CommandContext) {
   }
 
   const student = studentList.find((s) => s.id === data.studentId);
-  const calendarId =
-    user.calendarId ??
-    (await createCalendar({
-      summary: student?.shortName ?? ctx.from.first_name,
-    }).catch((err) => console.error(err)));
-  if (!calendarId) {
+  user.calendarId ??= await createCalendar({
+    summary: student?.shortName ?? ctx.from.first_name,
+  }).catch((err) => (console.error(err), undefined));
+  if (!user.calendarId) {
     return await handleError(
       ctx,
       message,
       "Произошла ошибка 😔\nПопробуйте повторить попытку позже."
     );
   }
+  await createRule(user.calendarId, {
+    role: "writer",
+    scope: { type: "user", value: userName },
+  }).catch((err) => console.error(err));
 
   await ctx.deleteMessage(message.message_id);
   return await calendarInfo(ctx, "Вы успешно авторизировались!");
