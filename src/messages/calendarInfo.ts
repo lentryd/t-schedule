@@ -7,13 +7,13 @@ import messageManager, {
 
 export default async function calendarInfo(
   ctx: AnyContext,
-  additionalMessage?: string
+  additionalMessage = ""
 ) {
   const user = await ctx.user;
   const session = await ctx.session;
   session.state = user.calendarId ? "done" : "set_student";
 
-  if (additionalMessage) additionalMessage += "\n\n";
+  if (additionalMessage !== "") additionalMessage += "\n\n";
   const welcomeMessage = !user.calendarId
     ? "Я помогу вам перенести ваше расписание в Google Calendar и Apple iCalendar."
     : "С помощью кнопок ниже, вы можете легко добавить ваше расписание в Google Calendar или Apple iCalendar.";
