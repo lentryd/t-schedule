@@ -8,7 +8,6 @@ import messageManager, {
   clearMessagesAfter,
 } from "../utils/messageManager";
 
-
 const ERROR_MESSAGE =
   "Произошла ошибка 😔\nПопробуйте снова через некоторое время";
 const ERROR_KEYBOARD = Markup.inlineKeyboard([
@@ -46,7 +45,7 @@ export default async function callbackStudent(ctx: CallbackContext) {
   user.calendarId = calendarId;
   user.educationSpaceId = student.spaceID;
 
-  return await calendarInfo(ctx);
+  return await calendarInfo(ctx, "Ваш календарь готов!");
 }
 
 async function handleError(ctx: CallbackContext, errorMessage: string) {

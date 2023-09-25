@@ -7,7 +7,7 @@ import messageManager, {
 
 export default async function calendarInfo(
   ctx: AnyContext,
-  additionalMessage = "Ваш календарь готов!"
+  additionalMessage?: string
 ) {
   const user = await ctx.user;
   const session = await ctx.session;
