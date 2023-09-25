@@ -65,10 +65,10 @@ export function formatSchedule(
 
     const descriptionList = [];
     if (item.info.moduleName) {
-      descriptionList.push(item.info.moduleName + "\n");
+      descriptionList.push(item.info.moduleName);
     }
     if (item.info.theme) {
-      descriptionList.push(`Тема: ${item.info.theme}`);
+      descriptionList.push(item.info.theme + "\n");
     }
     if (item.info.groupName) {
       descriptionList.push(`Группа: ${item.info.groupName}`);
@@ -80,7 +80,7 @@ export function formatSchedule(
     if (item.info.teachersNames) {
       const teacherLabel =
         item.info.teachers.length === 1 ? "Преподаватель" : "Преподаватели";
-      descriptionList.push(`\n${teacherLabel}: ${item.info.teachersNames}`);
+      descriptionList.push(`${teacherLabel}: ${item.info.teachersNames}`);
     }
     const description = descriptionList.join("\n").trim();
 
