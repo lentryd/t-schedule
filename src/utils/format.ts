@@ -29,6 +29,7 @@ export function formatStudent(
 }
 
 export type ScheduleFormat = {
+  id?: string;
   raspId: string;
   etag: string;
 

@@ -32,31 +32,38 @@ export default async function synchronizeCalendar() {
   await Promise.all(
     usersToUpdate.map(async (user) => {
       try {
+        console.log(`Processing user (${user.id})...`);
         await processUser(user);
+        console.log(`User (${user.id}) processed successfully.`);
       } catch (error) {
         console.error(`Error processing user (${user.id}):`, error);
       }
     })
   );
+
+  console.log("Synchronization completed");
 }
 
 async function getUsersToUpdate(): Promise<User[]> {
   // Get users with outdated schedules or no schedules
   const timestampThreshold = getTimestampThreshold();
   const timestampFilter = Filter.or(
-    Filter.where("lastScheduleUpdate", "==", null),
+    Filter.where("lastScheduleUpdate", "!=", null),
     Filter.where("lastScheduleUpdate", "<", timestampThreshold)
   );
 
-  return (await usersCollection.where(timestampFilter).get()).docs.map(
-    (doc) => ({ id: doc.id, ...doc.data() })
-  );
+  console.log("Fetching users to update...");
+  const usersSnapshot = await usersCollection.where(timestampFilter).get();
+  console.log("Users fetched successfully.");
+
+  return usersSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 }
 
 async function processUser(user: User) {
   const { calendarId, educationSpaceId, studentId } = user;
   if (!calendarId || !educationSpaceId || !studentId) return;
 
+  console.log(`Processing user (${user.id}) for schedule updates...`);
   const raspList = await Wrapper.getRaspList(educationSpaceId, studentId);
   const eventList = (await listEvent(calendarId)).map(formatEvent);
 
@@ -80,25 +87,35 @@ async function processUser(user: User) {
       eventsToDelete.push(event.id);
     }
   });
+  if (eventList.length == eventsToDelete.length) {
+    eventsToDelete.length = 0;
+    console.log("Try delete 100% of events");
+  }
 
   // Perform updates, creations, and deletions
   for (const event of eventsToUpdate) {
     try {
+      console.log(`Updating event for user (${user.id})...`);
       await updateEvent(calendarId, event);
+      console.log(`Event updated successfully.`);
     } catch (error) {
       console.error(`Error updating event:`, error);
     }
   }
   for (const event of eventsToCreate) {
     try {
+      console.log(`Creating event for user (${user.id})...`);
       await createEvent(calendarId, event);
+      console.log(`Event created successfully.`);
     } catch (error) {
       console.error(`Error creating event:`, error);
     }
   }
   for (const eventId of eventsToDelete) {
     try {
+      console.log(`Deleting event for user (${user.id})...`);
       await deleteEvent(calendarId, eventId);
+      console.log(`Event deleted successfully.`);
     } catch (error) {
       console.error(`Error deleting event:`, error);
     }
@@ -107,6 +124,7 @@ async function processUser(user: User) {
   // Update the user's last schedule update timestamp
   user.lastScheduleUpdate = Timestamp.now();
   await usersCollection.doc(user.id).set(user);
+  console.log(`User (${user.id}) schedule updates completed.`);
 }
 
 function getTimestampThreshold() {
