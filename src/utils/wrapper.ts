@@ -255,11 +255,15 @@ export default class Wrapper {
     spaceID: number,
     studentId: number
   ): Promise<ScheduleFormat[]> {
-    const startDate = new Date(new Date().toISOString().split("T")[0]);
+    const startDate = new Date(
+      new Date().toLocaleString("en-US", { timeZone: "Europe/Moscow" })
+    );
+    startDate.setDate(1);
     startDate.setHours(0, 0, 0, 0);
     const endDate = new Date(startDate);
-    endDate.setMonth(endDate.getMonth() + 1);
+    endDate.setMonth(endDate.getMonth() + 2);
     endDate.setHours(23, 59, 59, 999);
+    endDate.setDate(0);
 
     const endpoint =
       RASP_URL +

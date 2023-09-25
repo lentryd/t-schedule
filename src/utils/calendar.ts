@@ -90,13 +90,15 @@ export async function deleteRule(calendarId: string, ruleId: string) {
 // События
 export async function listEvent(calendarId: string, start?: Date, end?: Date) {
   if (!start) {
-    start = new Date(new Date().toISOString());
+    start = new Date();
+    start.setDate(1);
     start.setHours(0, 0, 0, 0);
   }
   if (!end) {
     end = new Date(start);
-    end.setDate(end.getDate() + 1);
-    end.setMonth(end.getMonth() + 1);
+    end.setMonth(end.getMonth() + 2);
+    end.setHours(23, 59, 59, 999);
+    end.setDate(0);
   }
 
   const events = await calendar.events.list({
@@ -114,6 +116,8 @@ export async function createEvent(
 ) {
   // Добираем параметры по умолчанию
   params = { ...DEFAULT_EVENT_OPTIONS, ...params };
+  delete params.id;
+  delete params.etag;
 
   // Создаем событие
   const eventRes = await calendar.events.insert({
@@ -132,8 +136,9 @@ export async function updateEvent(
   // Добираем параметры по умолчанию
   params = { ...DEFAULT_EVENT_OPTIONS, ...params };
   const eventId = params.id;
-  delete params.id;
   if (!eventId) throw new Error("Event ID not found");
+  delete params.id;
+  delete params.etag;
   // Изменяем событие
   return await calendar.events.update({
     calendarId,
