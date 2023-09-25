@@ -29,7 +29,7 @@ export function formatStudent(
 }
 
 export type ScheduleFormat = {
-  id: string;
+  raspId: string;
   etag: string;
 
   start: {
@@ -84,7 +84,7 @@ export function formatSchedule(
     const description = descriptionList.join("\n").trim();
 
     return {
-      id: hash([startDateTime, endDateTime, item.name].join("-")),
+      raspId: hash([startDateTime, endDateTime, summary].join("-")),
       etag: hash([summary, colorId, location, description].join("-")),
 
       start: {
@@ -103,9 +103,17 @@ export function formatSchedule(
     };
   });
 }
-export function formatEvent(event: calendar_v3.Schema$Event): ScheduleFormat {
+export function formatEvent(
+  event: calendar_v3.Schema$Event
+): ScheduleFormat & { id: string } {
+  const startDateTime =
+    event.start?.dateTime && new Date(event.start.dateTime).toISOString();
+  const endDateTime =
+    event.end?.dateTime && new Date(event.end.dateTime).toISOString();
+
   return {
     id: event.id as string,
+    raspId: hash([startDateTime, endDateTime, event.summary].join("-")),
     etag: hash(
       [event.summary, event.colorId, event.location, event.description].join(
         "-"
