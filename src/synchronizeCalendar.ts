@@ -19,6 +19,7 @@ import { ScheduleFormat, formatEvent } from "./utils/format";
 
 // Define constants
 const MS_IN_DAY = 1000 * 60 * 60 * 24;
+const MS_IN_HOUR = 1000 * 60 * 60;
 const USER_UPDATE_TIME = 1000 * 60 * 10;
 // Define types
 type User = UserData & { id: string };
@@ -65,7 +66,7 @@ async function processUser(user: User) {
 
   // Find events that need to be updated or created
   raspList.forEach((item) => {
-    const event = eventList.find((e) => e.id === item.id);
+    const event = eventList.find((e) => e.raspId === item.raspId);
     if (!event) {
       eventsToCreate.push(item);
     } else if (item.etag !== event.etag) {
@@ -75,17 +76,33 @@ async function processUser(user: User) {
 
   // Find events that need to be deleted
   eventList.forEach((event) => {
-    if (!raspList.find((item) => event.id === item.id)) {
+    if (!raspList.find((item) => event.raspId === item.raspId)) {
       eventsToDelete.push(event.id);
     }
   });
 
-  // Perform updates, creations, and deletions in parallel
-  await Promise.all([
-    Promise.all(eventsToUpdate.map((event) => updateEvent(calendarId, event))),
-    Promise.all(eventsToCreate.map((event) => createEvent(calendarId, event))),
-    Promise.all(eventsToDelete.map((id) => deleteEvent(calendarId, id))),
-  ]);
+  // Perform updates, creations, and deletions
+  for (const event of eventsToUpdate) {
+    try {
+      await updateEvent(calendarId, event);
+    } catch (error) {
+      console.error(`Error updating event:`, error);
+    }
+  }
+  for (const event of eventsToCreate) {
+    try {
+      await createEvent(calendarId, event);
+    } catch (error) {
+      console.error(`Error creating event:`, error);
+    }
+  }
+  for (const eventId of eventsToDelete) {
+    try {
+      await deleteEvent(calendarId, eventId);
+    } catch (error) {
+      console.error(`Error deleting event:`, error);
+    }
+  }
 
   // Update the user's last schedule update timestamp
   user.lastScheduleUpdate = Timestamp.now();
@@ -101,7 +118,7 @@ function getTimestampThreshold() {
   if (date.getHours() >= 7 && date.getHours() <= 18 && date.getDay() > 0) {
     return Timestamp.fromMillis(now - USER_UPDATE_TIME);
   } else {
-    return Timestamp.fromMillis(now - MS_IN_DAY);
+    return Timestamp.fromMillis(now - MS_IN_HOUR / 2);
   }
 }
 
@@ -157,9 +174,8 @@ async function fetchAndAddStudents(
 function shouldIgnoreUpdate() {
   const lastUpdatedTimestamp = studentListLastUpdatedTimestamp || 0;
   const currentTime = Date.now();
-  const oneDayInMillis = 1000 * 60 * 60 * 24;
 
-  return currentTime - lastUpdatedTimestamp < oneDayInMillis;
+  return currentTime - lastUpdatedTimestamp < MS_IN_DAY;
 }
 
 function randomInt(max: number) {
