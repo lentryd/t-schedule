@@ -84,17 +84,15 @@ async function processUser(user: User) {
   // Find events that need to be deleted
   const date = new Date(new Date().toISOString());
   date.setHours(0, 0, 0, 0);
-  eventList.forEach((event) => {
-    if (
-      !raspList.find(
-        (item) =>
-          event.raspId === item.raspId &&
-          new Date(item.start.dateTime).getTime() >= date.getTime()
-      )
-    ) {
-      eventsToDelete.push(event.id);
-    }
-  });
+  eventList
+    .filter(
+      (event) => new Date(event.start.dateTime).getTime() >= date.getTime()
+    )
+    .forEach((event) => {
+      if (!raspList.find((item) => event.raspId === item.raspId)) {
+        eventsToDelete.push(event.id);
+      }
+    });
 
   // Perform updates, creations, and deletions
   for (const event of eventsToUpdate) {
