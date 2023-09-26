@@ -67,8 +67,7 @@ bot.launch(
 console.log("bot started");
 
 // Запускаем синхронизацию
-schedule("* * * * *", () => {
-  console.log("start synchronize");
+schedule("*/5 * * * *", () => {
   synchronizeCalendar().catch((err) => console.error(err));
   updateStudentList().catch((err) => console.error(err));
 });
