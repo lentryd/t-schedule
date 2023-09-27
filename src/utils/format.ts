@@ -86,7 +86,7 @@ export function formatSchedule(
 
     return {
       raspId: hash([startDateTime, endDateTime, summary].join("-")),
-      etag: hash([summary, colorId, location, description].join("-")),
+      etag: hash([summary, location, description].join("-")),
 
       start: {
         dateTime: startDateTime,
@@ -115,11 +115,7 @@ export function formatEvent(
   return {
     id: event.id as string,
     raspId: hash([startDateTime, endDateTime, event.summary].join("-")),
-    etag: hash(
-      [event.summary, event.colorId, event.location, event.description].join(
-        "-"
-      )
-    ),
+    etag: hash([event.summary, event.location, event.description].join("-")),
 
     start: {
       dateTime: event.start?.dateTime as string,

@@ -77,6 +77,7 @@ async function processUser(user: User) {
       eventsToCreate.push(item);
     } else if (item.etag !== event.etag) {
       item.id = event.id;
+      item.colorId = event.colorId;
       eventsToUpdate.push(item);
     }
   });
@@ -119,7 +120,9 @@ async function processUser(user: User) {
 
   // Update the user's last schedule update timestamp
   user.lastScheduleUpdate = Timestamp.now();
-  await usersCollection.doc(user.id).set(user);
+  await usersCollection
+    .doc(user.id)
+    .update({ lastScheduleUpdate: user.lastScheduleUpdate });
   console.log(`${logPrefix}: Schedule updates completed.`);
 }
 
