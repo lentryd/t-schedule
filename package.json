@@ -4,9 +4,10 @@
   "version": "1.0.0",
   "description": "Бот для выгрузки расписания Т-университета",
   "scripts": {
-    "serve": "tsc && concurrently \"tsc -w\" \"nodemon --watch dist dist/index.js\" ",
+    "copy": "copyfiles -u 2 src/assets/* dist/assets",
+    "serve": "npm run build && concurrently \"tsc -w\" \"nodemon --watch dist dist/index.js\" ",
     "start": "npm run build && node dist/index.js",
-    "build": "tsc"
+    "build": "npm run copy && tsc"
   },
   "author": "lentryd",
   "license": "MIT",
@@ -14,17 +15,20 @@
     "type": "git",
     "url": "git+https://github.com/lentryd/t-schedule.git"
   },
-  "devDependencies": {
+  "dependencies": {
     "@google-cloud/firestore": "^6.7.0",
     "@googleapis/calendar": "^9.3.1",
+    "node-fetch": "^2.7.0",
+    "telegraf": "^4.14.0"
+  },
+  "devDependencies": {
     "@types/node": "^20.6.0",
     "@types/node-cron": "^3.0.8",
     "@types/node-fetch": "^2.6.5",
     "concurrently": "^8.2.1",
+    "copyfiles": "^2.4.1",
     "node-cron": "^3.0.2",
-    "node-fetch": "^2.7.0",
     "nodemon": "^3.0.1",
-    "telegraf": "^4.13.1",
     "typescript": "^5.2.2"
   }
 }

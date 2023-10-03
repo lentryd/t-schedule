@@ -51,7 +51,7 @@ export async function clearMessagesAfter(ctx: AnyContext) {
  */
 export default async function messageManager(
   ctx: AnyContext,
-  message?: Message.TextMessage
+  message?: Message
 ): Promise<void> {
   const session = await ctx.session;
 
@@ -65,10 +65,7 @@ export default async function messageManager(
  * @param session - Сессия пользователя.
  * @param message - Текстовое сообщение.
  */
-async function handleSendMessage(
-  session: SessionData,
-  message: Message.TextMessage
-) {
+async function handleSendMessage(session: SessionData, message: Message) {
   session.recentMessageIds.push(message.message_id);
 }
 

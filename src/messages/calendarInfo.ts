@@ -26,10 +26,7 @@ export default async function calendarInfo(
             `https://calendar.google.com/calendar/render?cid=${user.calendarId}`
           ),
 
-          Markup.button.url(
-            "Apple iCalendar",
-            `https://calendar.google.com/calendar/ical/${user.calendarId}/public/basic.ics`
-          ),
+          Markup.button.callback("Apple iCalendar", `iCal`),
         ],
 
     user.calendarId
