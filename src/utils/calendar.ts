@@ -56,7 +56,12 @@ export async function createCalendar(params?: DefaultCalendarOptions) {
     console.error("Ошибка открытия календаря: ", err);
     return undefined;
   });
-  if (!ruleId) throw new Error("Unable to create calendar due to Acl error");
+  if (!ruleId) {
+    await deleteCalendar(calendarId).catch((err) =>
+      console.error("Ошибка удаления календаря: ", err)
+    );
+    throw new Error("Unable to create calendar due to Acl error");
+  }
 
   return calendarId;
 }
@@ -65,10 +70,42 @@ export async function deleteCalendar(calendarId: string) {
 }
 
 // Правила
+/**
+ * Make calendar public
+ * @param calendarId - ID of the calendar
+ */
+export async function createRule(calendarId: string): Promise<string>;
+/**
+ * Make calendar accessible only for the specified user
+ * @param calendarId - ID of the calendar
+ * @param email - Email address of the user
+ */
 export async function createRule(
   calendarId: string,
-  params?: DefaultRuleOptions
+  email: string
+): Promise<string>;
+/**
+ * Create a rule by the specified options
+ * @param calendarId - ID of the calendar
+ * @param params - Parameters
+ */
+export async function createRule(
+  calendarId: string,
+  params: DefaultRuleOptions
+): Promise<string>;
+export async function createRule(
+  calendarId: string,
+  arg?: string | DefaultRuleOptions
 ) {
+  let params: DefaultRuleOptions = {};
+  if (typeof arg === "string") {
+    params = {
+      role: "writer",
+      scope: { type: "user", value: arg },
+    };
+  } else if (typeof arg === "object" && arg.role) {
+    params = arg;
+  }
   // Добираем параметры по умолчанию
   params = { ...DEFAULT_RULE_OPTIONS, ...params };
 
@@ -80,11 +117,8 @@ export async function createRule(
   });
   const ruleId = aclRes.data.id;
 
-  if (!ruleId) throw new Error("Rule ID not found");
+  if (!ruleId) throw new Error("Не получилось создать правило");
   return ruleId;
-}
-export async function deleteRule(calendarId: string, ruleId: string) {
-  await calendar.acl.delete({ calendarId, ruleId });
 }
 
 // События

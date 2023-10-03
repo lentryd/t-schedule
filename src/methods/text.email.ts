@@ -31,10 +31,9 @@ export default async function textEmail(ctx: TextContext) {
   }
 
   const message = await ctx.reply("Добавляю почту, пожалуйста, подождите...");
-  const ruleId = await createRule(user.calendarId, {
-    role: "writer",
-    scope: { type: "user", value: email },
-  }).catch((err) => console.error(err));
+  const ruleId = await createRule(user.calendarId, email).catch((err) =>
+    console.error(err)
+  );
   if (!ruleId) {
     return await ctx.telegram.editMessageText(
       message.chat.id,

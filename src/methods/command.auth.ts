@@ -65,13 +65,12 @@ export default async function commandAuth(ctx: CommandContext) {
       "Произошла ошибка 😔\nПопробуйте повторить попытку позже."
     );
   }
-  await createRule(user.calendarId, {
-    role: "writer",
-    scope: { type: "user", value: userName },
-  }).catch((err) => console.error(err));
+  await createRule(user.calendarId, userName).catch((err) =>
+    console.error(err)
+  );
 
   await ctx.deleteMessage(message.message_id);
-  return await calendarInfo(ctx, "Вы успешно авторизировались!");
+  return await calendarInfo(ctx, "Вы успешно авторизовались!");
 }
 
 async function handleError(
