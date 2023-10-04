@@ -6,8 +6,7 @@
   "scripts": {
     "serve": "npm run build && concurrently \"tsc -w\" \"nodemon --watch dist dist/index.js\" ",
     "start": "npm run build && node dist/index.js",
-    "build": "npm run del && npm run copy && tsc",
-    "del": "rimraf dist"
+    "build": "rimraf dist && tsc"
   },
   "author": "lentryd",
   "license": "MIT",
