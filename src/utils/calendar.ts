@@ -37,7 +37,7 @@ const auth = new GCalendar.auth.GoogleAuth({
     "https://www.googleapis.com/auth/calendar",
     "https://www.googleapis.com/auth/calendar.events",
   ],
-  keyFilename: "token.json",
+  keyFilename: "credentials.json",
 });
 const calendar = GCalendar.calendar({ version: "v3", auth });
 

@@ -1,6 +1,10 @@
-import { Firestore, CollectionReference, Timestamp } from "@google-cloud/firestore";
+import {
+  Firestore,
+  CollectionReference,
+  Timestamp,
+} from "@google-cloud/firestore";
 
-const db = new Firestore({ keyFilename: "token.json" });
+const db = new Firestore({ keyFilename: "credentials.json" });
 
 // Коллекция с системными дан
 export const sysCollection = db.collection("sys");
