@@ -1,4 +1,5 @@
 // Библиотеки и т.д.
+import "dotenv/config";
 import { schedule } from "node-cron";
 import { Telegraf } from "telegraf";
 import { message, callbackQuery } from "telegraf/filters";

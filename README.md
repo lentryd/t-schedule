@@ -80,6 +80,7 @@ npm run start
 
 ## Зависимости
 
+- [dotenv](https://www.npmjs.com/package/dotenv) - Модуль с нулевой зависимостью, который загружает переменные окружения из файла `.env` в `process.env`
 - [telegraf](https://www.npmjs.com/package/telegraf) - Современный фреймворк Telegram Bot API для Node.js
 - [node-fetch](https://www.npmjs.com/package/node-fetch) - Fetch API в Node.js
 - [@googleapis/calendar](https://www.npmjs.com/package/@googleapis/calendar) - API Google Calendar позволяет вам управлять своими календарями и событиями
