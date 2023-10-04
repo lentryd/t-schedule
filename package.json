@@ -6,8 +6,9 @@
   "scripts": {
     "serve": "npm run build && concurrently \"tsc -w\" \"nodemon --watch dist dist/index.js\" ",
     "start": "npm run build && node dist/index.js",
-    "build": "npm run copy && tsc",
-    "copy": "copyfiles -u 2 src/assets/* dist/assets"
+    "build": "npm run del && npm run copy && tsc",
+    "copy": "copyfiles -u 2 src/assets/* dist/assets",
+    "del": "rimraf dist"
   },
   "author": "lentryd",
   "license": "MIT",
@@ -30,6 +31,7 @@
     "copyfiles": "^2.4.1",
     "node-cron": "^3.0.2",
     "nodemon": "^3.0.1",
+    "rimraf": "^5.0.5",
     "typescript": "^5.2.2"
   }
 }
