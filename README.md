@@ -1,73 +1,99 @@
-# NetSchoolApi
+# T-Schedule Bot
 
-Это враппер для продукта "Сетевой город. Образование", который позволяет получать информацию о пользователе, такую как дневник, расписание и многое другое.
+T-Schedule Bot - это Telegram-бот, разработанный для переноса расписания с [edu.donstu.ru](https://edu.donstu.ru) в Google Calendar. Этот бот автоматизирует процесс управления расписанием и помогает студентам быть в курсе своих учебных занятий.
 
-## Начало работы
+## Описание проекта
 
-Следующие инструкции помогут вам запустить проект на вашем локальном компьютере для разработки и тестирования.
+T-Schedule Bot предоставляет следующие ключевые функции:
+
+- Перенос расписания с [edu.donstu.ru](https://edu.donstu.ru) в Google Calendar.
+- Возможность настройки цветовых меток для разных видов занятий.
+- Ручная установка и обновление ID студента.
+- Автоматическое обновление расписания каждые 15 минут в учебное время.
+
+## Использование бота
+
+### Команда /start
+
+Команда `/start` запускает бота и отправляет ссылку на ваш календарь (если такой есть).
+
+### Команда /auth
+
+Команда `/auth` необходима для авторизации в боте. Следуйте инструкциям для входа в ваш аккаунт на [edu.donstu.ru](https://edu.donstu.ru).
+
+### Команда /student
+
+Команда `/student` позволяет вручную установить ID студента для получения расписания.
+
+### Команда /colorize
+
+Команда `/colorize` позволяет настроить цветовые метки для занятий в вашем календаре.
+
+## Поддерживаемые платформы
+
+T-Schedule Bot поддерживает Telegram как платформу для взаимодействия. Вы можете [добавить бота](https://t.me/t_schedule_bot) к себе в Телеграме и начать использовать его.
+
+## Тестирование и разработка
+
+Следующие инструкции помогут вам запустить этого бота на вашем локальном компьютере для разработки и тестирования.
 
 ### Предварительные условия
 
-Для установки и использования этой библиотеки вам понадобятся:
+Для установки и использования этого бота вам понадобятся:
 
-- NodeJS ≥ v10.24.1 ([установить](https://nodejs.org/ru/download/))
+- Node.js ≥ v10.24.1 ([установить](https://nodejs.org/ru/download/))
 
 ### Установка
 
-Вы можете установить библиотеку с помощью следующей команды:
+1. Скопируйте репозиторий с ботом:
 
 ```bash
-npm i netschoolapi
+git clone https://github.com/lentryd/t-schedule.git
+cd t-schedule
 ```
 
-## Проверка установки
-
-1. Создайте файл `test.js` в корне проекта.
-2. Вставьте следующий код в файл `test.js`, заменив данные на ваши:
-
-```javascript
-const NS = require("netschoolapi").default;
-const user = new NS({
-  origin: "https://example.com/", // Origin вашего сайта
-  login: "Иванов", // Ваш логин
-  password: "******", // Ваш пароль
-  school: "МБОУ ....", // Название вашей школы (как на сайте)
-});
-
-(async function () {
-  const info = await user.info();
-  console.log(info);
-})();
-```
-
-3. Запустите этот код в консоли с помощью следующей команды:
+2. Установите зависимости с помощью `npm`:
 
 ```bash
-node test.js
+npm i
 ```
 
-4. Если в консоли не выводится информация о пользователе, убедитесь, что у вас установлена подходящая версия NodeJS, либо создайте [issue](https://github.com/lentryd/NetSchoolApi/issues/new) на GitHub.
+3. Создайте файл `.env` в корне проекта и добавьте в него следующие переменные:
 
-## Дополнительная информация о библиотеке
+```env
+BOT_TOKEN=ваш_токен_бота
+```
 
-- [Доступные методы](./docs/guide.md)
-- [Доступные классы](./docs/reference.md)
+5. Создайте проект в [Google Cloud Platform](https://console.cloud.google.com/)
+6. Подключите [Google Calendar API](https://console.cloud.google.com/apis/library/calendar-json.googleapis.com)
+7. Подключите [Google Cloud Firestore API](https://console.cloud.google.com/apis/library/firestore.googleapis.com)
+8. Создайте [Service Account](https://console.cloud.google.com/iam-admin/serviceaccounts/create)
+9. Выберите свою учетную запись службы
+10. Нажмите «Ключи» > «Добавить ключ» > «Создать новый ключ»
+11. Выберите JSON , затем нажмите «Создать» <br>
+    Ваша новая пара открытого/закрытого ключей генерируется и загружается на ваш компьютер в виде нового файла. Сохраните загруженный файл JSON как `credentials.json` в своем рабочем каталоге.
+12. Запустите бота:
+
+```bash
+npm run start
+```
 
 ## Зависимости
 
-- [ws](https://www.npmjs.com/package/ws) - Клиентская реализация WebSocket
+- [telegraf](https://www.npmjs.com/package/telegraf) - Современный фреймворк Telegram Bot API для Node.js
 - [node-fetch](https://www.npmjs.com/package/node-fetch) - Fetch API в Node.js
-- [node-html-parser](https://www.npmjs.com/package/node-html-parser) - Генерация упрощенного DOM-дерева с поддержкой запросов к элементам.
+- [@googleapis/calendar](https://www.npmjs.com/package/@googleapis/calendar) - API Google Calendar позволяет вам управлять своими календарями и событиями
+- [@google-cloud/firestore](https://www.npmjs.com/package/@google-cloud/firestore) - Node.js Серверный SDK для [Google Cloud Firestore](https://firebase.google.com/docs/firestore/)
 
 ## Управление версиями
 
-Версии этой библиотеки управляются согласно [SemVer](http://semver.org/). Список доступных версий можно найти в разделе [теги](https://github.com/lentryd/NetSchoolApi/tags).
+Версии этой библиотеки управляются согласно [SemVer](http://semver.org/). Список доступных версий можно найти в разделе [теги](https://github.com/lentryd/t-schedule/tags).
 
 ## Авторы
 
 - [lentryd](https://github.com/lentryd)
 
-Также посмотрите список [участников](https://github.com/lentryd/NetSchoolApi/contributors), которые внесли свой вклад в проект.
+Также посмотрите список [участников](https://github.com/lentryd/t-schedule/contributors), которые внесли свой вклад в проект.
 
 ## Лицензия
 
