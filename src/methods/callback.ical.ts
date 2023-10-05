@@ -1,4 +1,3 @@
-import { join } from "path";
 import { fmt, bold, code } from "telegraf/format";
 import { CallbackContext } from "../context";
 import calendarInfo from "../messages/calendarInfo";
@@ -15,7 +14,7 @@ export default async function callbackICal(ctx: CallbackContext) {
       {
         caption: fmt`
           ${bold(
-            "Инструкция по добавлению календаря в Apple Calendar"
+            "Инструкция по добавлению календаря в Apple iCalendar"
           )}\n\n1. Скопируйте ссылку вашего календаря:\n${code(
           `https://calendar.google.com/calendar/ical/${user.calendarId}/public/basic.ics`
         )}\n2. В приложении "Календарь" нажмите "Календари"\n3. Нажмите "Добавить\n4. Нажмите "Добавить подписной календарь"\n5. Вставьте ссылку на календарь\n6. Нажмите "Подписаться"\n7. Нажмите "Добавить"
