@@ -10,7 +10,7 @@ export default async function callbackICal(ctx: CallbackContext) {
   await clearMessagesAfter(ctx);
   return await ctx
     .replyWithVideo(
-      "BAACAgIAAxkBAAIzFGUda_ibdxLWMfCfRLLzsGIR1yInAAIEPgACJrPoSFSI5RDl0czlMAQ",
+      "https://drive.google.com/uc?id=1IXNCIeRYVuL624KDmE2wLOFsKPOUTb_Z&export=download",
       {
         caption: fmt`
           ${bold(
