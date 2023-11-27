@@ -251,10 +251,12 @@ export default class Wrapper {
    * @param studentId - Идентификатор студента
    * @returns Массив расписания студента
    */
-  static async getRaspList(
+  async getRaspList(
     spaceID: number,
     studentId: number
   ): Promise<ScheduleFormat[]> {
+    if (await this.checkSession()) await this.Auth();
+
     const startDate = new Date(
       new Date().toLocaleString("en-US", { timeZone: "Europe/Moscow" })
     );
@@ -273,11 +275,19 @@ export default class Wrapper {
       `&showJournalFilled=false`;
 
     return await Promise.all([
-      fetch(endpoint + `&month=${startDate.getMonth() + 1}`)
+      fetch(endpoint + `&month=${startDate.getMonth() + 1}`, {
+        headers: {
+          Authorization: "Bearer " + this.accessToken,
+        },
+      })
         .then((res) => res.json() as Promise<RaspListResponse>)
         .then((data) => formatSchedule(data.data.raspList))
         .catch((err) => (console.error(err), [])),
-      fetch(endpoint + `&month=${endDate.getMonth() + 1}`)
+      fetch(endpoint + `&month=${endDate.getMonth() + 1}`, {
+        headers: {
+          Authorization: "Bearer " + this.accessToken,
+        },
+      })
         .then((res) => res.json() as Promise<RaspListResponse>)
         .then((data) => formatSchedule(data.data.raspList))
         .catch((err) => (console.error(err), [])),

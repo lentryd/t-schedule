@@ -63,7 +63,18 @@ async function processUser(user: User) {
   const logPrefix = `User (${user.id})`;
 
   console.log(`${logPrefix}: Processing for schedule updates....`);
-  const raspList = await Wrapper.getRaspList(educationSpaceId, studentId);
+  const providers = (
+    await providersCollection
+      .where("educationSpaceId", "==", user.educationSpaceId)
+      .get()
+  ).docs.map((doc) => doc.data());
+  const randomIndex = randomInt(providers.length - 1);
+  const provider = providers.splice(randomIndex, 1)[0];
+
+  const raspList = await new Wrapper(provider).getRaspList(
+    educationSpaceId,
+    studentId
+  );
   const eventList = (await listEvent(calendarId)).map(formatEvent);
 
   const eventsToUpdate: ScheduleFormat[] = [];
@@ -88,6 +99,11 @@ async function processUser(user: User) {
       eventsToDelete.push(event.id);
     }
   });
+
+  if (eventsToDelete.length / eventList.length > 0.5) eventsToDelete.length = 0;
+  console.log(eventsToUpdate);
+  console.log(eventsToCreate);
+  console.log(eventsToDelete);
 
   // Perform updates, creations, and deletions
   for (const event of eventsToUpdate) {
