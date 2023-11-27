@@ -101,9 +101,6 @@ async function processUser(user: User) {
   });
 
   if (eventsToDelete.length / eventList.length > 0.5) eventsToDelete.length = 0;
-  console.log(eventsToUpdate);
-  console.log(eventsToCreate);
-  console.log(eventsToDelete);
 
   // Perform updates, creations, and deletions
   for (const event of eventsToUpdate) {
