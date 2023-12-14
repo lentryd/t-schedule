@@ -13,9 +13,10 @@ export const sysCollection = db.collection("sys");
 export interface UserData {
   studentId?: number;
   calendarId?: string;
+  providerId?: string;
   educationSpaceId?: number;
+  scheduleColorize: boolean;
   lastScheduleUpdate: Timestamp;
-  hasEnteredEmail: boolean;
 }
 export const usersCollection = db.collection(
   "users"
@@ -33,12 +34,10 @@ export const sessionsCollection = db.collection(
 
 // Коллекция для хранения данных провайдеров
 export interface ProviderData {
-  userId: number;
-  educationSpaceId: number;
-
   userName: string;
   password: string;
   accessToken?: string;
+  educationSpaceId: number;
 }
 export const providersCollection = db.collection(
   "providers"

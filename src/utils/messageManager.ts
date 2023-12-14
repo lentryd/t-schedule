@@ -1,5 +1,4 @@
 import { Message } from "telegraf/types";
-import { AnyContext } from "../context";
 import { SessionData } from "./database";
 
 /**
@@ -75,8 +74,13 @@ async function handleSendMessage(session: SessionData, message: Message) {
  * @param session - Сессия пользователя.
  */
 async function handleNewMessage(ctx: AnyContext, session: SessionData) {
-  const isCommand = "command" in ctx && !ctx.message.via_bot;
-  if (isCommand && ctx.command === "start") {
+  const isCommand =
+    ctx.message &&
+    "text" in ctx.message &&
+    ctx.message.text.startsWith("/") &&
+    !ctx.message.via_bot;
+  
+  if (isCommand && ctx.message.text.startsWith("/start")) {
     session.commandMessageIds = [ctx.message.message_id];
     await clearMessages(ctx, session.recentMessageIds);
     session.recentMessageIds = [ctx.message.message_id];

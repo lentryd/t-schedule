@@ -1,0 +1,96 @@
+{
+  "name": {
+    "en": "T-Schedule Bot",
+    "ru": "Расписание Т-университета"
+  },
+  "description": {
+    "en": "Transfer your schedule from edu.donstu.ru to Google Calendar for more stability 🙃\n\nGitHub: github.com/lentryd/t-schedule\nContacts: @lentryd",
+    "ru": "Переносите расписание с edu.donstu.ru в Google Calendar, ведь он стабильнее 🙃\n\nGitHub: github.com/lentryd/t-schedule\nКонтакты: @lentryd"
+  },
+  "profile_description": {
+    "en": "Bot for exporting schedules of T-University and School X",
+    "ru": "Бот для выгрузки расписания Т-университета и Школы Икс"
+  },
+  "command_start": {
+    "en": "Start the bot",
+    "ru": "Запустить бота"
+  },
+  "command_auth": {
+    "en": "Authorize",
+    "ru": "Авторизоваться"
+  },
+  "command_student": {
+    "en": "Specify a student",
+    "ru": "Указать студента"
+  },
+  "command_colorize": {
+    "en": "Colorize schedule",
+    "ru": "Раскрасить расписание"
+  },
+
+  "welcome_message": {
+    "en": "I will help you transfer your schedule from edu.donstu.ru to Google Calendar and Apple iCalendar.",
+    "ru": "Я помогу вам перенести расписание с edu.donstu.ru в Google Календарь и Apple Календарь."
+  },
+  "calendar_info": {
+    "en": "With the buttons below, you can easily add your schedule to Google Calendar or Apple iCalendar.",
+    "ru": "С помощью кнопок ниже, вы можете легко добавить ваше расписание в Google Календарь или Apple Календарь."
+  },
+  "calendar_error": {
+    "en": "Failed to create the calendar.\n_Try again later_",
+    "ru": "Не удалось создать календарь.\n_Попробуйте ещё позже_"
+  },
+  "calendar_update": {
+    "en": "Updating the calendar, please wait...",
+    "ru": "Обновляю календарь, пожалуйста, подождите..."
+  },
+  "calendar_process": {
+    "en": "Creating the calendar, please wait...",
+    "ru": "Создаю календарь, пожалуйста, подождите..."
+  },
+  "auth_message": {
+    "en": "To authenticate, enter the /auth command with your login and password from your personal account on edu.donstu.ru. In the format `/auth login password`, where `login` is your login, and `password` is your password.\n\nExample:\n/auth example@gmail.com 123456",
+    "ru": "Для авторизации, введите команду /auth с вашим логином и паролем от личного кабинета на edu.donstu.ru. В формате `/auth login password`, где `login` - ваш логин, а `password` - ваш пароль.\n\nПример:\n/auth example@gmail.com 123456"
+  },
+  "auth_error": {
+    "en": "Authentication failed.\n_Check the entered data or try again later_",
+    "ru": "Не удалось авторизоваться.\n_Проверьте введенные данные или попробуйте ещё позже_"
+  },
+  "auth_update": {
+    "en": "You are already authenticated in the bot.\n\nIf you want to update your data, enter the /auth command with your login and password from your personal account on edu.donstu.ru.\n\nExample:\n/auth example@gmail.com 123456",
+    "ru": "Вы уже авторизованы в боте.\n\nЕсли хотите обновить данные, то введите команду /auth с вашим логином и паролем от личного кабинета на edu.donstu.ru.\n\nПример:\n/auth example@gmail.com 123456"
+  },
+  "auth_process": {
+    "en": "Checking data, please wait...",
+    "ru": "Проверка данных, пожалуйста, подождите..."
+  },
+  "student_message": {
+    "en": "To configure a student, enter the /student command and specify the student's identifier after it.\n\nExample:\n/student 123456",
+    "ru": "Для настройки студента, введите команду /student и после неё укажите идентификатор студента.\n\nПример:\n/student 123456"
+  },
+  "student_inline": {
+    "en": "Configure by last name",
+    "ru": "Настроить по фамилии"
+  },
+  "student_not_found": {
+    "en": "The student with the specified identifier was not found in the database. Please try authenticating using the /auth command.",
+    "ru": "Студент с указанным идентификатором не найден в базе данных. Пожалуйста, попробуйте выполнить аутентификацию с помощью команды /auth"
+  },
+
+  "create_calendar": {
+    "en": "Transfer schedule",
+    "ru": "Перенести расписание"
+  },
+  "google_calendar": {
+    "en": "Google Calendar",
+    "ru": "Google Календарь"
+  },
+  "apple_calendar": {
+    "en": "Apple iCalendar",
+    "ru": "Apple Календарь"
+  },
+  "share_calendar": {
+    "en": "Share",
+    "ru": "Поделиться"
+  }
+}
