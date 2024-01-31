@@ -322,9 +322,10 @@ export default class Wrapper {
     const tokenAuth = await fetch(TOKEN_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ isParent: false, recaptchaToken: null, fingerprint: "hs@SHzqNbc_N9O1_a730jgPIaCMnKrW5K6YyiaTh-PbJ24VPvjM?ObXBb38EnDC1FJCC5DeAoU1UFGVmx$7reZqyiXVwiO@@NqEt1SasELZ9rC@VgVWqMaWviTjhxzgYZ5HeBs0emOmS-xHfb-OM7V", userName, password }),
+      body: JSON.stringify({ isParent: false, recaptchaToken: null, userName, password }),
     })
-      .then((res) => res.json() as Promise<TokenAuthResponse>)
+      .then((res) => res.text())
+      .then((text) => (console.log(text), JSON.parse(text) as Promise<TokenAuthResponse>))
       .catch((err) => console.log(err));
     if (!tokenAuth) throw new Error("Can't get token for user: " + userName);
 
