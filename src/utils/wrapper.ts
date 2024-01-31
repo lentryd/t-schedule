@@ -255,7 +255,7 @@ export default class Wrapper {
     spaceID: number,
     studentId: number
   ): Promise<ScheduleFormat[]> {
-    if (await this.checkSession()) await this.Auth();
+    if (!(await this.checkSession())) await this.Auth();
 
     const startDate = new Date(
       new Date().toLocaleString("en-US", { timeZone: "Europe/Moscow" })
@@ -318,6 +318,7 @@ export default class Wrapper {
    */
   async Auth() {
     const { userName, password } = this.credentials;
+    console.log("Authenticating user: " + userName);
     const tokenAuth = await fetch(TOKEN_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -339,7 +340,8 @@ export default class Wrapper {
         Authorization: "Bearer " + this.accessToken,
       },
     })
-      .then((res) => res.status == 200)
+      .then((res) => res.json())
+      .then(({ state }) => state === 1)
       .catch((err) => (console.error(err), false));
   }
 
@@ -347,7 +349,7 @@ export default class Wrapper {
    * Получаем список студентов
    */
   async getStudentList(): Promise<Student[]> {
-    if (await this.checkSession()) await this.Auth();
+    if (!(await this.checkSession())) await this.Auth();
 
     const studentList = await fetch(
       STUDENT_URL + "?educationSpaceID=" + this.spaceId,
