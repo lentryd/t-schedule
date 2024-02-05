@@ -1,6 +1,6 @@
 import { createHash } from "crypto";
 import nearestColor from "./colorize";
-import { RaspListResponse } from "./wrapper";
+import { RaspListResponse, RaspResponse } from "./wrapper";
 import { Student, studentList } from "../utils/database";
 import { calendar_v3 } from "@googleapis/calendar";
 
@@ -104,6 +104,63 @@ export function formatSchedule(
     };
   });
 }
+export function formatRasp(
+  rasp: RaspResponse["data"]["rasp"]
+): ScheduleFormat[] {
+  return rasp.map((item) => {
+    const startDateTime = new Date(item.датаНачала + "+03:00").toISOString();
+    const endDateTime = new Date(item.датаОкончания + "+03:00").toISOString();
+    const timeZone = "Europe/Moscow";
+
+    let summary = item.дисциплина.trim();
+
+    const colorId = "11";
+    const location = item.аудитория;
+
+    const descriptionList = [];
+    if (item.тема) {
+      descriptionList.push(item.тема + "\n");
+    }
+    if (item.группа) {
+      descriptionList.push(`Группа: ${item.группа}`);
+    }
+    if (item.ссылка && REGEX_URL.test(item.ссылка)) {
+      const linkList = item.ссылка.match(REGEX_URL);
+      descriptionList.push(`Ссылки: ${linkList?.join(", ")}`);
+    }
+    if (item.преподаватель) {
+      const teacherLabel =
+        item.преподаватель.split(",").length === 1
+          ? "Преподаватель"
+          : "Преподаватели";
+      descriptionList.push(`${teacherLabel}: ${item.преподаватель}`);
+    }
+    descriptionList.push(
+      "\nЭто расписание резервного копирования на время возникновения трудностей с доступом к edu.donsu.ru. Пожалуйста, проверьте актуальное расписание на сайте университета. Извините за предоставленные неудобства."
+    );
+    const description = descriptionList.join("\n").trim();
+
+    return {
+      raspId: hash([startDateTime, endDateTime, summary].join("-")),
+      etag: hash([summary, location, description].join("-")),
+
+      start: {
+        dateTime: startDateTime,
+        timeZone: timeZone,
+      },
+      end: {
+        dateTime: endDateTime,
+        timeZone: timeZone,
+      },
+
+      summary,
+      colorId,
+      location,
+      description,
+    };
+  });
+}
+
 export function formatEvent(
   event: calendar_v3.Schema$Event
 ): ScheduleFormat & { id: string } {

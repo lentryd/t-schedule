@@ -28,16 +28,13 @@ export default async function synchronizeCalendar() {
   // Retrieve users that need schedule updates
   const usersToUpdate = await getUsersToUpdate();
 
-  // Process each user in parallel
-  await Promise.all(
-    usersToUpdate.map(async (user) => {
-      try {
-        await processUser(user);
-      } catch (error) {
-        console.error(`User (${user.id}): Error processing user:`, error);
-      }
-    })
-  );
+  for (const user of usersToUpdate) {
+    try {
+      await processUser(user);
+    } catch (error) {
+      console.error(`User (${user.id}): Error processing user:`, error);
+    }
+  }
 
   console.log("Synchronization completed");
 }
@@ -67,14 +64,17 @@ async function processUser(user: User) {
     await providersCollection
       .where("educationSpaceId", "==", user.educationSpaceId)
       .get()
-  ).docs.map((doc) => doc.data());
+  ).docs.map((doc) => [doc.id, doc.data()] as [string, ProviderData]);
   const randomIndex = randomInt(providers.length - 1);
   const provider = providers.splice(randomIndex, 1)[0];
 
-  const raspList = await new Wrapper(provider).getRaspList(
-    educationSpaceId,
-    studentId
-  );
+  const raspList = await new Wrapper(provider[1], provider[0])
+    .getRaspList(educationSpaceId, studentId)
+    .catch((error) => {
+      console.error(`${logPrefix}: Error fetching rasp list:`, error);
+      console.info(`${logPrefix}: Trying to fetch the reserve...`);
+      return Wrapper.getReserveRasp(studentId);
+    });
   const eventList = (await listEvent(calendarId)).map(formatEvent);
 
   const eventsToUpdate: ScheduleFormat[] = [];
@@ -100,7 +100,7 @@ async function processUser(user: User) {
     }
   });
 
-  if (eventsToDelete.length / eventList.length > 0.5) eventsToDelete.length = 0;
+  if (eventsToDelete.length > raspList.length) eventsToDelete.length = 0;
 
   // Perform updates, creations, and deletions
   for (const event of eventsToUpdate) {

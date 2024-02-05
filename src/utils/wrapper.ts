@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
-import { ProviderData, Student } from "./database";
-import { ScheduleFormat, formatSchedule } from "./format";
+import { ProviderData, Student, providersCollection } from "./database";
+import { ScheduleFormat, formatRasp, formatSchedule } from "./format";
 
 const ORIGIN = "https://edu.donstu.ru/";
 const RASP_URL = ORIGIN + "api/RaspManager";
@@ -206,6 +206,82 @@ export type RaspListResponse = {
   state: number;
   msg: string;
 };
+export type RaspResponse = {
+  data: {
+    isCyclicalSchedule: boolean;
+    rasp: Array<{
+      код: number;
+      дата: string;
+      датаНачала: string;
+      датаОкончания: string;
+      перерыв?: number;
+      начало: string;
+      конец: string;
+      деньНедели: number;
+      день_недели: string;
+      почта: string;
+      день: string;
+      код_Семестра: number;
+      типНедели: number;
+      номерПодгруппы: number;
+      дисциплина: string;
+      преподаватель: string;
+      должность: string;
+      аудитория: string;
+      учебныйГод: string;
+      группа: string;
+      custom1: string;
+      часы: string;
+      неделяНачала: any;
+      неделяОкончания: any;
+      замена?: boolean;
+      кодПреподавателя?: number;
+      кодГруппы: number;
+      фиоПреподавателя?: string;
+      кодПользователя?: number;
+      элементЦиклРасписания: boolean;
+      тема: string;
+      номерЗанятия: number;
+      ссылка?: string;
+      созданиеВебинара: boolean;
+      кодВебинара: any;
+      вебинарЗапущен: boolean;
+      показатьЖурнал: boolean;
+      кодыСтрок: Array<number>;
+    }>;
+    info: {
+      group: {
+        name: string;
+        groupID: number;
+      };
+      prepod: {
+        name: string;
+      };
+      kafedra: {
+        name: string;
+      };
+      aud: {
+        name: string;
+      };
+      year: string;
+      curWeekNumber: number;
+      curNumNed: number;
+      selectedNumNed: number;
+      curSem: number;
+      typesWeek: Array<{
+        typeWeekID: number;
+        name: string;
+        shortName: string;
+      }>;
+      fixedInCache: boolean;
+      date: string;
+      lastDate: string;
+      dateUploadingRasp: string;
+    };
+  };
+  state: number;
+  msg: string;
+};
 
 export default class Wrapper {
   /**
@@ -243,6 +319,34 @@ export default class Wrapper {
     if (!spaceId) return;
 
     return { accessToken, spaceId, studentId };
+  }
+
+  /**
+   * Получить расписание студента на месяц (резервный метод)
+   * @param studentId - Идентификатор студента
+   */
+  static async getReserveRasp(studentId: number) {
+    const startDate = new Date(
+      new Date().toLocaleString("en-US", { timeZone: "Europe/Moscow" })
+    );
+    startDate.setDate(1);
+    startDate.setHours(0, 0, 0, 0);
+    const endDate = new Date(startDate);
+    endDate.setMonth(endDate.getMonth() + 2);
+    endDate.setHours(23, 59, 59, 999);
+    endDate.setDate(0);
+
+    const endpoint = ORIGIN + "api/Rasp" + `?idStudent=${studentId}`;
+    return fetch(endpoint)
+      .then((res) => res.json() as Promise<RaspResponse>)
+      .then(({ data }) => formatRasp(data.rasp))
+      .then((rasp) =>
+        rasp.filter(
+          (i) =>
+            new Date(i.start.dateTime).getTime() >= startDate.getTime() &&
+            new Date(i.start.dateTime).getTime() <= endDate.getTime()
+        )
+      );
   }
 
   /**
@@ -301,11 +405,13 @@ export default class Wrapper {
   }
 
   private spaceId: number;
+  private providerId: string | undefined;
   private credentials: { userName: string; password: string };
   private accessToken: string | undefined;
 
-  constructor(provider: ProviderData) {
+  constructor(provider: ProviderData, providerId?: string) {
     this.spaceId = provider.educationSpaceId;
+    this.providerId = providerId;
     this.credentials = {
       userName: provider.userName,
       password: provider.password,
@@ -329,17 +435,15 @@ export default class Wrapper {
         password,
       }),
     })
-      .then((res) => res.text())
-      .then(
-        (text) => (
-          console.log("Auth response:", text),
-          JSON.parse(text) as Promise<TokenAuthResponse>
-        )
-      )
+      .then((res) => res.json() as Promise<TokenAuthResponse>)
       .catch((err) => console.log(err));
     if (!tokenAuth) throw new Error("Can't get token for user: " + userName);
 
     this.accessToken = tokenAuth.data.accessToken;
+    this.providerId &&
+      providersCollection
+        .doc(this.providerId)
+        .update({ accessToken: this.accessToken });
   }
 
   /**
