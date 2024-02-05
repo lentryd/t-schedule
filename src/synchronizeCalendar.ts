@@ -104,7 +104,7 @@ async function processUser(user: User) {
     }
   });
 
-  if (eventsToDelete.length > raspList.length) eventsToDelete.length = 0;
+  if (raspList.length == 0) eventsToDelete.length = 0;
 
   // Perform updates, creations, and deletions
   for (const event of eventsToUpdate) {
