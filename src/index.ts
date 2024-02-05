@@ -19,7 +19,10 @@ import inlineCommon from "./methods/inline.common";
 import callbackCommon from "./methods/callback.common";
 import calendarInfo from "./messages/calendarInfo";
 // Синхронизация календаря и обновление студентов.
-import synchronizeCalendar, { updateStudentList } from "./synchronizeCalendar";
+import synchronizeCalendar, {
+  isProgress,
+  updateStudentList,
+} from "./synchronizeCalendar";
 
 // Инициализация бота.
 const token = process.env.BOT_TOKEN;
@@ -69,6 +72,6 @@ console.log("bot started");
 
 // Запускаем синхронизацию
 schedule("*/5 * * * *", () => {
-  synchronizeCalendar().catch((err) => console.error(err));
+  if (!isProgress) synchronizeCalendar().catch((err) => console.error(err));
   updateStudentList().catch((err) => console.error(err));
 });

@@ -24,7 +24,10 @@ const USER_UPDATE_TIME = 1000 * 60 * 10;
 // Define types
 type User = UserData & { id: string };
 
+export let isProgress = false;
+
 export default async function synchronizeCalendar() {
+  isProgress = true;
   // Retrieve users that need schedule updates
   const usersToUpdate = await getUsersToUpdate();
 
@@ -37,6 +40,7 @@ export default async function synchronizeCalendar() {
   }
 
   console.log("Synchronization completed");
+  isProgress = false;
 }
 
 async function getUsersToUpdate(): Promise<User[]> {
