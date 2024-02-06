@@ -1,4 +1,5 @@
 import fetch from "node-fetch";
+import { createHash } from "crypto";
 import { ProviderData, Student, providersCollection } from "./database";
 import { ScheduleFormat, formatRasp, formatSchedule } from "./format";
 
@@ -366,6 +367,35 @@ export default class Wrapper {
             new Date(i.start.dateTime).getTime() <= endDate.getTime()
         )
       );
+  }
+
+  /**
+   * Получить хэш расписания студента
+   * @param studentId - Идентификатор студента
+   * @returns Хэш расписания студента
+   */
+  static async getRaspHash(studentId: number): Promise<string> {
+    const shasum = createHash("sha1");
+    const endpoint = ORIGIN + "api/Rasp" + `?idStudent=${studentId}&iCal=true`;
+
+    return fetch(endpoint, {
+      headers: {
+        Accept: "application/json",
+        Fp: "hs%40SHzqNbc_N9O1_a730jgPIaCMnKrW5K6YyiaTh-PbJ24VPvjM%3FObXBb38EnDC1FJCC5DeAoU1UFGVmx%247reZqyiXVwiO%40%40NqEt1SasELZ9rC%40VgVWqMaWviTjhxzgYZ5HeBs0emOmS-xHfb-OM7V",
+        "Current-Path": "https://edu.donstu.ru/WebApp/#/Rasp/Group/",
+        Referer: "https://edu.donstu.ru/WebApp/",
+        "Cache-Control": "no-cache",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+      },
+    }).then((res) => {
+      return new Promise((resolve, reject) =>
+        res.body
+          .on("data", (chunk) => shasum.update(chunk))
+          .on("error", (err) => reject(err))
+          .on("end", () => resolve(shasum.digest("hex")))
+      );
+    });
   }
 
   /**

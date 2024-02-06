@@ -14,6 +14,7 @@ export interface UserData {
   studentId?: number;
   calendarId?: string;
   educationSpaceId?: number;
+  raspHash?: string;
   lastScheduleUpdate: Timestamp;
   hasEnteredEmail: boolean;
 }

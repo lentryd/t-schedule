@@ -59,11 +59,23 @@ async function getUsersToUpdate(): Promise<User[]> {
 }
 
 async function processUser(user: User) {
-  const { calendarId, educationSpaceId, studentId } = user;
+  const { calendarId, educationSpaceId, studentId, raspHash } = user;
   if (!calendarId || !educationSpaceId || !studentId) return;
   const logPrefix = `User (${user.id})`;
+  const currentRaspHash = await Wrapper.getRaspHash(studentId);
 
   console.log(`${logPrefix}: Processing for schedule updates....`);
+
+  // If the schedule is up to date, return
+  if (raspHash == currentRaspHash) {
+    user.lastScheduleUpdate = Timestamp.now();
+    await usersCollection
+      .doc(user.id)
+      .update({ lastScheduleUpdate: user.lastScheduleUpdate });
+    console.log(`${logPrefix}: Schedule is up to date.`);
+    return;
+  }
+
   const providers = (
     await providersCollection
       .where("educationSpaceId", "==", user.educationSpaceId)
@@ -130,10 +142,12 @@ async function processUser(user: User) {
   }
 
   // Update the user's last schedule update timestamp
+  user.raspHash = currentRaspHash;
   user.lastScheduleUpdate = Timestamp.now();
-  await usersCollection
-    .doc(user.id)
-    .update({ lastScheduleUpdate: user.lastScheduleUpdate });
+  await usersCollection.doc(user.id).update({
+    raspHash: user.raspHash,
+    lastScheduleUpdate: user.lastScheduleUpdate,
+  });
   console.log(`${logPrefix}: Schedule updates completed.`);
 }
 
