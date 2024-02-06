@@ -293,7 +293,16 @@ export default class Wrapper {
   static async tryAuth(userName: string, password: string) {
     const response = await fetch(TOKEN_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Fp: "hs%40SHzqNbc_N9O1_a730jgPIaCMnKrW5K6YyiaTh-PbJ24VPvjM%3FObXBb38EnDC1FJCC5DeAoU1UFGVmx%247reZqyiXVwiO%40%40NqEt1SasELZ9rC%40VgVWqMaWviTjhxzgYZ5HeBs0emOmS-xHfb-OM7V",
+        "Current-Path": "https://edu.donstu.ru/WebApp/#/login",
+        Referer: "https://edu.donstu.ru/WebApp/",
+        "Cache-Control": "no-cache",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+      },
       body: JSON.stringify({ userName, password }),
     })
       .then((res) => res.json() as Promise<TokenAuthResponse>)
@@ -337,7 +346,17 @@ export default class Wrapper {
     endDate.setDate(0);
 
     const endpoint = ORIGIN + "api/Rasp" + `?idStudent=${studentId}`;
-    return fetch(endpoint)
+    return fetch(endpoint, {
+      headers: {
+        Accept: "application/json",
+        Fp: "hs%40SHzqNbc_N9O1_a730jgPIaCMnKrW5K6YyiaTh-PbJ24VPvjM%3FObXBb38EnDC1FJCC5DeAoU1UFGVmx%247reZqyiXVwiO%40%40NqEt1SasELZ9rC%40VgVWqMaWviTjhxzgYZ5HeBs0emOmS-xHfb-OM7V",
+        "Current-Path": "https://edu.donstu.ru/WebApp/#/Rasp/Group/",
+        Referer: "https://edu.donstu.ru/WebApp/",
+        "Cache-Control": "no-cache",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+      },
+    })
       .then((res) => res.json() as Promise<RaspResponse>)
       .then(({ data }) => formatRasp(data.rasp))
       .then((rasp) =>
@@ -382,19 +401,33 @@ export default class Wrapper {
       fetch(endpoint + `&month=${startDate.getMonth() + 1}`, {
         headers: {
           Authorization: "Bearer " + this.accessToken,
+          Cookie: "authToken=" + this.accessToken,
+          Accept: "application/json",
+          Fp: "hs%40SHzqNbc_N9O1_a730jgPIaCMnKrW5K6YyiaTh-PbJ24VPvjM%3FObXBb38EnDC1FJCC5DeAoU1UFGVmx%247reZqyiXVwiO%40%40NqEt1SasELZ9rC%40VgVWqMaWviTjhxzgYZ5HeBs0emOmS-xHfb-OM7V",
+          "Current-Path": "https://edu.donstu.ru/WebApp/#/RaspManager/Calendar",
+          Referer: "https://edu.donstu.ru/WebApp/",
+          "Cache-Control": "no-cache",
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
         },
       })
         .then((res) => res.json() as Promise<RaspListResponse>)
-        .then((data) => formatSchedule(data.data.raspList))
-        .catch((err) => (console.error(err), [])),
+        .then((data) => formatSchedule(data.data.raspList)),
       fetch(endpoint + `&month=${endDate.getMonth() + 1}`, {
         headers: {
           Authorization: "Bearer " + this.accessToken,
+          Cookie: "authToken=" + this.accessToken,
+          Accept: "application/json",
+          Fp: "hs%40SHzqNbc_N9O1_a730jgPIaCMnKrW5K6YyiaTh-PbJ24VPvjM%3FObXBb38EnDC1FJCC5DeAoU1UFGVmx%247reZqyiXVwiO%40%40NqEt1SasELZ9rC%40VgVWqMaWviTjhxzgYZ5HeBs0emOmS-xHfb-OM7V",
+          "Current-Path": "https://edu.donstu.ru/WebApp/#/RaspManager/Calendar",
+          Referer: "https://edu.donstu.ru/WebApp/",
+          "Cache-Control": "no-cache",
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
         },
       })
         .then((res) => res.json() as Promise<RaspListResponse>)
-        .then((data) => formatSchedule(data.data.raspList))
-        .catch((err) => (console.error(err), [])),
+        .then((data) => formatSchedule(data.data.raspList)),
     ]).then((arr) =>
       [...arr[0], ...arr[1]].filter(
         (i) =>
@@ -453,6 +486,14 @@ export default class Wrapper {
     return await fetch(TOKEN_URL, {
       headers: {
         Authorization: "Bearer " + this.accessToken,
+        Cookie: "authToken=" + this.accessToken,
+        Accept: "application/json",
+        Fp: "hs%40SHzqNbc_N9O1_a730jgPIaCMnKrW5K6YyiaTh-PbJ24VPvjM%3FObXBb38EnDC1FJCC5DeAoU1UFGVmx%247reZqyiXVwiO%40%40NqEt1SasELZ9rC%40VgVWqMaWviTjhxzgYZ5HeBs0emOmS-xHfb-OM7V",
+        "Current-Path": "https://edu.donstu.ru/WebApp/#/RaspManager/Calendar",
+        Referer: "https://edu.donstu.ru/WebApp/",
+        "Cache-Control": "no-cache",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
       },
     })
       .then((res) => res.json())
@@ -471,6 +512,14 @@ export default class Wrapper {
       {
         headers: {
           Authorization: "Bearer " + this.accessToken,
+          Cookie: "authToken=" + this.accessToken,
+          Accept: "application/json",
+          Fp: "hs%40SHzqNbc_N9O1_a730jgPIaCMnKrW5K6YyiaTh-PbJ24VPvjM%3FObXBb38EnDC1FJCC5DeAoU1UFGVmx%247reZqyiXVwiO%40%40NqEt1SasELZ9rC%40VgVWqMaWviTjhxzgYZ5HeBs0emOmS-xHfb-OM7V",
+          "Current-Path": "https://edu.donstu.ru/WebApp/#/RaspManager/Calendar",
+          Referer: "https://edu.donstu.ru/WebApp/",
+          "Cache-Control": "no-cache",
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
         },
       }
     )
