@@ -77,10 +77,14 @@ export function formatSchedule(
       const linkList = item.info.link.match(REGEX_URL);
       descriptionList.push(`Ссылки: ${linkList?.join(", ")}`);
     }
-    if (item.info.teachersNames) {
+    if (item.info.teachers.length > 0) {
       const teacherLabel =
         item.info.teachers.length === 1 ? "Преподаватель" : "Преподаватели";
-      descriptionList.push(`${teacherLabel}: ${item.info.teachersNames}`);
+      descriptionList.push(
+        `${teacherLabel}: ${item.info.teachers
+          .map((t) => `${t.fullName}` + (t.email ? ` (${t.email})` : ""))
+          .join(", ")}`
+      );
     }
     const description = descriptionList.join("\n").trim();
 

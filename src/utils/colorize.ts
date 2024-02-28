@@ -65,7 +65,32 @@ type LCH = { l: number; c: number; h: number };
  */
 function hexToLch(hex: string): LCH {
   const lchColor = chroma(hex).lch();
-  return { l: lchColor[0], c: lchColor[1], h: lchColor[2] };
+  return { l: lchColor[0] || 0, c: lchColor[1] || 0, h: lchColor[2] || 0 };
+}
+
+/**
+ * Конвертирует строку в HEX
+ * @param str Строка
+ * @returns HEX цвет
+ */
+function stringToHex(str: string) {
+  // Получаем цвет и его настройки яркости
+  const colorStr = str.split(" ")[0] || "";
+  const lightness = str.split(" ")[1] || "";
+
+  // Если цвет не найден, возвращаем зеленый цвет
+  if (!chroma.valid(colorStr)) return "#669933";
+
+  // Получаем цвет
+  const color = chroma(colorStr);
+  // Если надо, то затемняем цвет
+  if (lightness.startsWith("darken-"))
+    color.darken(parseInt(lightness.split("-")[1]));
+  // Если надо, то осветляем цвет
+  if (lightness.startsWith("brighten-"))
+    color.brighten(parseInt(lightness.split("-")[1]));
+
+  return color.hex();
 }
 
 /**
@@ -100,9 +125,17 @@ function cie94(color1: LCH, color2: LCH) {
   return deltaE;
 }
 
-export default function nearestColor(colorHex: string) {
+/**
+ * Находит ближайший цвет из массива EVENT_COLORS к исходному цвету
+ * @param color Исходный цвет (в формате HEX и словами)
+ * @returns ID ближайшего цвета
+ */
+export default function nearestColor(color: string) {
+  // Если цвет не начинается с #, конвертируем его в HEX
+  if (!color.startsWith("#")) color = stringToHex(color);
+
   // Конвертируем исходный цвет в HSL объект
-  let sourceLab = hexToLch(colorHex);
+  let sourceLab = hexToLch(color);
 
   // Инициализируем переменные для хранения наименьшей разницы и соответствующего цвета
   let minDifference = Infinity;
