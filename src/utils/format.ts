@@ -1,6 +1,10 @@
 import { createHash } from "crypto";
 import nearestColor from "./colorize";
-import { RaspListResponse, RaspResponse } from "./wrapper";
+import {
+  LessonsTypesResponse,
+  RaspListResponse,
+  RaspResponse,
+} from "./wrapper";
 import { Student, studentList } from "../utils/database";
 import { calendar_v3 } from "@googleapis/calendar";
 
@@ -49,8 +53,10 @@ export type ScheduleFormat = {
 };
 const REGEX_URL =
   /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
+const REGEX_ABBR = /(^.{2,}?)[aeiouаеёиоуыэюя]/;
 export function formatSchedule(
-  raspItem: RaspListResponse["data"]["raspList"]
+  raspItem: RaspListResponse["data"]["raspList"],
+  lessonsTypes?: LessonsTypesResponse["data"]["lessonsTypes"]
 ): ScheduleFormat[] {
   return raspItem.map((item) => {
     const startDateTime = new Date(item.start).toISOString();
@@ -58,10 +64,36 @@ export function formatSchedule(
     const timeZone = "Europe/Moscow";
 
     let summary = item.name.trim();
-    if (item.info.type) summary = `${item.info.type} | ${summary}`;
+    // Добавляем тип занятия к названию
+    if (item.info.type) {
+      // Ищем тип занятия по названию
+      const lessonType = lessonsTypes?.find(
+        (type) => type.label === item.info.type
+      );
+      // Получаем аббревиатуру типа занятия
+      let typeAbbr =
+        lessonType?.abbreviation ??
+        item.info.type.match(REGEX_ABBR)?.[1] ??
+        item.info.type;
+      // Делаем первую букву заглавной
+      typeAbbr = typeAbbr[0].toUpperCase() + typeAbbr.slice(1);
+
+      // Если аббревиатура найдена и она не совпадает с началом названия, добавляем ее
+      if (
+        typeAbbr &&
+        !(
+          summary.split(" ")[0].toLowerCase().replace(/\./g, "") ===
+          typeAbbr.toLowerCase().replace(/\./g, "")
+        )
+      ) {
+        summary = typeAbbr + " " + summary;
+      }
+    }
+    // Если это контрольное мероприятие, добавляем метку
+    if (item.info.isControlEvent) summary = "📝 " + summary;
 
     const colorId = nearestColor(item.color).toString();
-    const location = item.info.aud;
+    const location = item.info.aud ?? "";
 
     const descriptionList = [];
     if (item.info.moduleName) {

@@ -139,6 +139,11 @@ export type StudentListResponse = {
 };
 export type RaspListResponse = {
   data: {
+    benchmark: Array<{
+      text: string;
+      date: string;
+      time: number;
+    }>;
     raspList: Array<{
       name: string;
       color: string;
@@ -153,7 +158,7 @@ export type RaspListResponse = {
         moduleID?: number;
         moduleDisID?: number;
         theme: string;
-        aud: string;
+        aud?: string;
         link?: string;
         teacher: any;
         teacherName: any;
@@ -162,6 +167,7 @@ export type RaspListResponse = {
         teacherNumberMobile: any;
         photoPath: any;
         teacherID: any;
+        replacedTeacherID: any;
         userID: any;
         raspItemID: number;
         timeZanID: number;
@@ -175,7 +181,7 @@ export type RaspListResponse = {
         teachers: Array<{
           fullName: string;
           name: string;
-          email: string;
+          email?: string;
           number: any;
           userID: number;
           teacherID: number;
@@ -191,6 +197,8 @@ export type RaspListResponse = {
         type?: string;
         courses: Array<number>;
         journalFilled: boolean;
+        isReplace: boolean;
+        isControlEvent: boolean;
         dateChange: string;
       };
       groupsIDs: Array<number>;
@@ -279,6 +287,21 @@ export type RaspResponse = {
       lastDate: string;
       dateUploadingRasp: string;
     };
+  };
+  state: number;
+  msg: string;
+};
+export type LessonsTypesResponse = {
+  data: {
+    lessonsTypes: Array<{
+      id: number;
+      label: string;
+      abbreviation?: string;
+      showAll: boolean;
+      nonContact: boolean;
+      payment: any;
+      typeWorkID?: number;
+    }>;
   };
   state: number;
   msg: string;
@@ -409,6 +432,7 @@ export default class Wrapper {
     studentId: number
   ): Promise<ScheduleFormat[]> {
     if (!(await this.checkSession())) await this.Auth();
+    const lessonsTypes = await this.getLessonsTypes();
 
     const startDate = new Date(
       new Date().toLocaleString("en-US", { timeZone: "Europe/Moscow" })
@@ -442,7 +466,9 @@ export default class Wrapper {
         },
       })
         .then((res) => res.json() as Promise<RaspListResponse>)
-        .then((data) => formatSchedule(data.data.raspList)),
+        .then((data) =>
+          formatSchedule(data.data.raspList, lessonsTypes.data.lessonsTypes)
+        ),
       fetch(endpoint + `&month=${endDate.getMonth() + 1}`, {
         headers: {
           Authorization: "Bearer " + this.accessToken,
@@ -457,7 +483,9 @@ export default class Wrapper {
         },
       })
         .then((res) => res.json() as Promise<RaspListResponse>)
-        .then((data) => formatSchedule(data.data.raspList)),
+        .then((data) =>
+          formatSchedule(data.data.raspList, lessonsTypes.data.lessonsTypes)
+        ),
     ]).then((arr) =>
       [...arr[0], ...arr[1]].filter(
         (i) =>
@@ -465,6 +493,32 @@ export default class Wrapper {
           new Date(i.start.dateTime).getTime() <= endDate.getTime()
       )
     );
+  }
+
+  /**
+   * Получить типы занятий для учебного пространства
+   */
+  async getLessonsTypes(): Promise<LessonsTypesResponse> {
+    if (!(await this.checkSession())) await this.Auth();
+
+    const endpoint =
+      ORIGIN +
+      "api/SuggestedModules/LessonsTypes" +
+      `?educationSpaceID=${this.spaceId}`;
+
+    return await fetch(endpoint, {
+      headers: {
+        Authorization: "Bearer " + this.accessToken,
+        Cookie: "authToken=" + this.accessToken,
+        Accept: "application/json",
+        Fp: "hs%40SHzqNbc_N9O1_a730jgPIaCMnKrW5K6YyiaTh-PbJ24VPvjM%3FObXBb38EnDC1FJCC5DeAoU1UFGVmx%247reZqyiXVwiO%40%40NqEt1SasELZ9rC%40VgVWqMaWviTjhxzgYZ5HeBs0emOmS-xHfb-OM7V",
+        "Current-Path": "https://edu.donstu.ru/WebApp/#/RaspManager/Calendar",
+        Referer: "https://edu.donstu.ru/WebApp/",
+        "Cache-Control": "no-cache",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+      },
+    }).then((res) => res.json() as Promise<LessonsTypesResponse>);
   }
 
   private spaceId: number;
