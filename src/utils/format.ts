@@ -58,87 +58,89 @@ export function formatSchedule(
   raspItem: RaspListResponse["data"]["raspList"],
   lessonsTypes?: LessonsTypesResponse["data"]["lessonsTypes"]
 ): ScheduleFormat[] {
-  return raspItem.map((item) => {
-    const startDateTime = new Date(item.start).toISOString();
-    const endDateTime = new Date(item.end).toISOString();
-    const timeZone = "Europe/Moscow";
+  return raspItem
+    .filter((val) => val.end !== null)
+    .map((item) => {
+      const startDateTime = new Date(item.start).toISOString();
+      const endDateTime = new Date(item.end || item.start).toISOString();
+      const timeZone = "Europe/Moscow";
 
-    let summary = item.name.trim();
-    // Добавляем тип занятия к названию
-    if (item.info.type) {
-      // Ищем тип занятия по названию
-      const lessonType = lessonsTypes?.find(
-        (type) => type.label === item.info.type
-      );
-      // Получаем аббревиатуру типа занятия
-      let typeAbbr =
-        lessonType?.abbreviation ??
-        item.info.type.match(REGEX_ABBR)?.[1] ??
-        item.info.type;
-      // Делаем первую букву заглавной
-      typeAbbr = typeAbbr[0].toUpperCase() + typeAbbr.slice(1);
+      let summary = item.name.trim();
+      // Добавляем тип занятия к названию
+      if (item.info.type) {
+        // Ищем тип занятия по названию
+        const lessonType = lessonsTypes?.find(
+          (type) => type.label === item.info.type
+        );
+        // Получаем аббревиатуру типа занятия
+        let typeAbbr =
+          lessonType?.abbreviation ??
+          item.info.type.match(REGEX_ABBR)?.[1] ??
+          item.info.type;
+        // Делаем первую букву заглавной
+        typeAbbr = typeAbbr[0].toUpperCase() + typeAbbr.slice(1);
 
-      // Если аббревиатура найдена и она не совпадает с началом названия, добавляем ее
-      if (
-        typeAbbr &&
-        !(
-          summary.split(" ")[0].toLowerCase().replace(/\./g, "") ===
-          typeAbbr.toLowerCase().replace(/\./g, "")
-        )
-      ) {
-        summary = typeAbbr + " " + summary;
+        // Если аббревиатура найдена и она не совпадает с началом названия, добавляем ее
+        if (
+          typeAbbr &&
+          !(
+            summary.split(" ")[0].toLowerCase().replace(/\./g, "") ===
+            typeAbbr.toLowerCase().replace(/\./g, "")
+          )
+        ) {
+          summary = typeAbbr + " " + summary;
+        }
       }
-    }
-    // Если это контрольное мероприятие, добавляем метку
-    if (item.info.isControlEvent) summary = "📝 " + summary;
+      // Если это контрольное мероприятие, добавляем метку
+      if (item.info.isControlEvent) summary = "📝 " + summary;
 
-    const colorId = nearestColor(item.color).toString();
-    const location = item.info.aud ?? "";
+      const colorId = nearestColor(item.color).toString();
+      const location = item.info.aud ?? "";
 
-    const descriptionList = [];
-    if (item.info.moduleName) {
-      descriptionList.push(item.info.moduleName);
-    }
-    if (item.info.theme) {
-      descriptionList.push(item.info.theme + "\n");
-    }
-    if (item.info.groupName) {
-      descriptionList.push(`Группа: ${item.info.groupName}`);
-    }
-    if (item.info.link && REGEX_URL.test(item.info.link)) {
-      const linkList = item.info.link.match(REGEX_URL);
-      descriptionList.push(`Ссылки: ${linkList?.join(", ")}`);
-    }
-    if (item.info.teachers.length > 0) {
-      const teacherLabel =
-        item.info.teachers.length === 1 ? "Преподаватель" : "Преподаватели";
-      descriptionList.push(
-        `${teacherLabel}: ${item.info.teachers
-          .map((t) => `${t.fullName}` + (t.email ? ` (${t.email})` : ""))
-          .join(", ")}`
-      );
-    }
-    const description = descriptionList.join("\n").trim();
+      const descriptionList = [];
+      if (item.info.moduleName) {
+        descriptionList.push(item.info.moduleName);
+      }
+      if (item.info.theme) {
+        descriptionList.push(item.info.theme + "\n");
+      }
+      if (item.info.groupName) {
+        descriptionList.push(`Группа: ${item.info.groupName}`);
+      }
+      if (item.info.link && REGEX_URL.test(item.info.link)) {
+        const linkList = item.info.link.match(REGEX_URL);
+        descriptionList.push(`Ссылки: ${linkList?.join(", ")}`);
+      }
+      if (item.info.teachers && item.info.teachers.length > 0) {
+        const teacherLabel =
+          item.info.teachers.length === 1 ? "Преподаватель" : "Преподаватели";
+        descriptionList.push(
+          `${teacherLabel}: ${item.info.teachers
+            .map((t) => `${t.fullName}` + (t.email ? ` (${t.email})` : ""))
+            .join(", ")}`
+        );
+      }
+      const description = descriptionList.join("\n").trim();
 
-    return {
-      raspId: hash([startDateTime, endDateTime, summary].join("-")),
-      etag: hash([summary, location, description].join("-")),
+      return {
+        raspId: hash([startDateTime, endDateTime, summary].join("-")),
+        etag: hash([summary, location, description].join("-")),
 
-      start: {
-        dateTime: startDateTime,
-        timeZone: timeZone,
-      },
-      end: {
-        dateTime: endDateTime,
-        timeZone: timeZone,
-      },
+        start: {
+          dateTime: startDateTime,
+          timeZone: timeZone,
+        },
+        end: {
+          dateTime: endDateTime,
+          timeZone: timeZone,
+        },
 
-      summary,
-      colorId,
-      location,
-      description,
-    };
-  });
+        summary,
+        colorId,
+        location,
+        description,
+      };
+    });
 }
 export function formatRasp(
   rasp: RaspResponse["data"]["rasp"]

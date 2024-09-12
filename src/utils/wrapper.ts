@@ -149,15 +149,15 @@ export type RaspListResponse = {
       color: string;
       bordered: boolean;
       start: string;
-      end: string;
+      end: string | null;
       timeStart: any;
       timeEnd: any;
       info: {
         moduleName?: string;
         categoryID?: number;
-        moduleID?: number;
+        moduleID: number;
         moduleDisID?: number;
-        theme: string;
+        theme?: string;
         aud?: string;
         link?: string;
         teacher: any;
@@ -171,17 +171,17 @@ export type RaspListResponse = {
         userID: any;
         raspItemID: number;
         timeZanID: number;
-        teachersNames: string;
-        groupName: string;
-        groups: Array<{
+        teachersNames?: string;
+        groupName?: string;
+        groups?: Array<{
           name: string;
           groupID: number;
           raspItemID: any;
         }>;
-        teachers: Array<{
+        teachers?: Array<{
           fullName: string;
           name: string;
-          email?: string;
+          email: string;
           number: any;
           userID: number;
           teacherID: number;
@@ -189,9 +189,9 @@ export type RaspListResponse = {
         }>;
         groupID: number;
         typeID?: number;
-        educationSpaceID: number;
+        educationSpaceID?: number;
         authorModuleID?: number;
-        coauthorsIDs: Array<number>;
+        coauthorsIDs?: Array<any>;
         studentsCount: number;
         course: number;
         type?: string;
@@ -199,11 +199,12 @@ export type RaspListResponse = {
         journalFilled: boolean;
         isReplace: boolean;
         isControlEvent: boolean;
-        dateChange: string;
+        dateChange?: string;
+        showJournal: boolean;
       };
-      groupsIDs: Array<number>;
-      teachersIDs: Array<number | undefined>;
-      raspItemsIDs: Array<number>;
+      groupsIDs?: Array<number>;
+      teachersIDs?: Array<number>;
+      raspItemsIDs?: Array<number>;
       hide: boolean;
       isClassicItem: boolean;
     }>;
