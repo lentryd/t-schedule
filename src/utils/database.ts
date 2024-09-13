@@ -4,7 +4,9 @@ import {
   Timestamp,
 } from "@google-cloud/firestore";
 
-const db = new Firestore({ keyFilename: "credentials.json" });
+const db = new Firestore({
+  keyFilename: process.env.CREDENTIALS_PATH ?? "credentials.json",
+});
 
 // Коллекция с системными дан
 export const sysCollection = db.collection("sys");
