@@ -60,5 +60,5 @@ export let studentListLastUpdatedTimestamp: number = 0;
 sysCollection.doc("studentList").onSnapshot((snapshot) => {
   const data = snapshot.data();
   studentList = data?.list ?? [];
-  studentListLastUpdatedTimestamp = data?.timestamp.seconds * 1000 ?? 0;
+  studentListLastUpdatedTimestamp = (data?.timestamp.seconds ?? 0) * 1000;
 });
