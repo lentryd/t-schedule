@@ -76,21 +76,24 @@ async function processUser(user: User) {
     return;
   }
 
-  const providers = (
-    await providersCollection
-      .where("educationSpaceId", "==", user.educationSpaceId)
-      .get()
-  ).docs.map((doc) => [doc.id, doc.data()] as [string, ProviderData]);
-  const randomIndex = randomInt(providers.length - 1);
-  const provider = providers.splice(randomIndex, 1)[0];
-
-  const raspList = await new Wrapper(provider[1], provider[0])
-    .getRaspList(educationSpaceId, studentId)
-    .catch((error) => {
-      console.error(`${logPrefix}: Error fetching rasp list:`, error);
-      console.info(`${logPrefix}: Trying to fetch the reserve...`);
-      return Wrapper.getReserveRasp(studentId);
-    });
+  let raspList: ScheduleFormat[] = [];
+  try {
+    const providers = (
+      await providersCollection
+        .where("educationSpaceId", "==", user.educationSpaceId)
+        .get()
+    ).docs.map((doc) => [doc.id, doc.data()] as [string, ProviderData]);
+    const randomIndex = randomInt(providers.length - 1);
+    const provider = providers.splice(randomIndex, 1)[0];
+    raspList = await new Wrapper(provider[1], provider[0]).getRaspList(
+      educationSpaceId,
+      studentId
+    );
+  } catch (error) {
+    console.error(`${logPrefix}: Error fetching rasp list:`, error);
+    console.info(`${logPrefix}: Trying to fetch the reserve...`);
+    raspList = await Wrapper.getReserveRasp(studentId);
+  }
   const eventList = (await listEvent(calendarId)).map(formatEvent);
 
   const eventsToUpdate: ScheduleFormat[] = [];
