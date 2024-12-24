@@ -1,16 +1,15 @@
-FROM oven/bun:alpine AS builder
+FROM node:alpine AS builder
 
 # Create app directory
 WORKDIR /usr/src/app
 
 # Install app dependencies
 COPY package*.json ./
-COPY bun.lockb ./
-RUN bun install
+RUN npm install
 
 # Bundle app source
 COPY . .
-RUN bun run build
+RUN npm run build
 
 FROM node:alpine AS relies
 
