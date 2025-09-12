@@ -130,7 +130,10 @@ function cie94(color1: LCH, color2: LCH) {
  * @param color Исходный цвет (в формате HEX и словами)
  * @returns ID ближайшего цвета
  */
-export default function nearestColor(color: string) {
+export default function nearestColor(color: string | null) {
+  // Если цвет не задан, возвращаем дефолтный цвет
+  if (!color) return 2;
+
   // Если цвет не начинается с #, конвертируем его в HEX
   if (!color.startsWith("#")) color = stringToHex(color);
 
