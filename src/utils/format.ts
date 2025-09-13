@@ -26,7 +26,7 @@ export function formatStudent(student: Student): StudentFormat;
 export function formatStudent(arg: number | Student): StudentFormat | undefined {
     let student: Student | undefined;
 
-    if (typeof arg === 'number') student = studentList.find(({ id }) => id === arg);
+    if (typeof arg === 'number') student = studentList.find(({ id }) => String(id) === String(arg));
     else student = arg;
     if (!student) return undefined;
 
