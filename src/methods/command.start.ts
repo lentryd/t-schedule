@@ -1,8 +1,13 @@
-import { CommandContext } from "../context";
-import calendarInfo from "../messages/calendarInfo";
-import messageManager from "../utils/messageManager";
+import { CommandContext } from '@/context';
+import calendarInfo from '@/messages/calendarInfo';
+import messageManager from '@/utils/messageManager';
 
-export default async function commandStart(ctx: CommandContext) {
-  await messageManager(ctx);
-  return await calendarInfo(ctx);
+/**
+ * Стартовая команда для инициализации календаря.
+ * @param ctx Контекст команды
+ * @returns Promise<void>
+ */
+export default async function commandStart(ctx: CommandContext): Promise<void> {
+    await messageManager(ctx);
+    return await calendarInfo(ctx);
 }

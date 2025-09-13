@@ -1,0 +1,3 @@
+#!/bin/bash
+bun run type-check
+bun run lint-staged

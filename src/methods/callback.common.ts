@@ -1,28 +1,32 @@
-import callbackStudent from "./callback.student";
-import { CallbackContext } from "../context";
-import callbackICal from "./callback.ical";
-import calendarInfo from "../messages/calendarInfo";
-import callbackColorize from "./callback.colorize";
+import { CallbackContext } from '@/context';
+import calendarInfo from '@/messages/calendarInfo';
 
-export default async function callbackCommon(ctx: CallbackContext) {
-  const { data } = ctx.callbackQuery;
-  if (data == "iCal") return await callbackICal(ctx);
-  if (data == "cancel") return await calendarInfo(ctx, "Действие отменено!");
+import callbackColorize from './callback.colorize';
+import callbackICal from './callback.ical';
+import callbackStudent from './callback.student';
 
-  const session = await ctx.session;
-  switch (session.state) {
-    case "set_student":
-      return await callbackStudent(ctx);
+/**
+ * Обрабатывает общие колбэки и перенаправляет их к соответствующим обработчикам.
+ */
+export default async function callbackCommon(ctx: CallbackContext): Promise<void> {
+    const { data } = ctx.callbackQuery;
 
-    case "done":
-    case "set_email":
-      if (data == "set_email") return await callbackColorize(ctx);
+    if (data === 'iCal') return await callbackICal(ctx);
+    if (data === 'cancel') return await calendarInfo(ctx, 'Действие отменено!');
 
-    default:
-      await ctx.answerCbQuery(
-        "Произошла ошибка, пожалуйста, повторите попытку",
-        { show_alert: true }
-      );
-      return await calendarInfo(ctx);
-  }
+    const session = await ctx.session;
+
+    switch (session.state) {
+        case 'set_student':
+            await callbackStudent(ctx);
+            break;
+        case 'done':
+        case 'set_email':
+            if (data === 'set_email') await callbackColorize(ctx);
+            break;
+
+        default:
+            await ctx.answerCbQuery('Произошла ошибка, пожалуйста, повторите попытку', { show_alert: true });
+            await calendarInfo(ctx);
+    }
 }

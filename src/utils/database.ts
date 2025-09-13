@@ -1,64 +1,55 @@
-import {
-  Firestore,
-  CollectionReference,
-  Timestamp,
-} from "@google-cloud/firestore";
+import { CollectionReference, Firestore, Timestamp } from '@google-cloud/firestore';
 
 const db = new Firestore({
-  keyFilename: process.env.CREDENTIALS_PATH ?? "credentials.json",
+    keyFilename: process.env.CREDENTIALS_PATH ?? 'credentials.json',
 });
 
 // Коллекция с системными дан
-export const sysCollection = db.collection("sys");
+export const sysCollection = db.collection('sys');
 
 // Коллекция для хранения данных пользователей
 export interface UserData {
-  studentId?: number;
-  calendarId?: string;
-  educationSpaceId?: number;
-  raspHash?: string;
-  lastScheduleUpdate: Timestamp;
-  hasEnteredEmail: boolean;
+    studentId?: number;
+    calendarId?: string;
+    educationSpaceId?: number;
+    raspHash?: string;
+    lastScheduleUpdate: Timestamp;
+    hasEnteredEmail: boolean;
 }
-export const usersCollection = db.collection(
-  "users"
-) as CollectionReference<UserData>;
+export const usersCollection = db.collection('users') as CollectionReference<UserData>;
 
 // Коллекция для хранения данных сессий
 export interface SessionData {
-  state: string;
-  recentMessageIds: number[];
-  commandMessageIds: number[];
+    state: string;
+    recentMessageIds: number[];
+    commandMessageIds: number[];
 }
-export const sessionsCollection = db.collection(
-  "sessions"
-) as CollectionReference<SessionData>;
+export const sessionsCollection = db.collection('sessions') as CollectionReference<SessionData>;
 
 // Коллекция для хранения данных провайдеров
 export interface ProviderData {
-  userId: number;
-  educationSpaceId: number;
+    userId: number;
+    educationSpaceId: number;
 
-  userName: string;
-  password: string;
-  accessToken?: string;
+    userName: string;
+    password: string;
+    accessToken?: string;
 }
-export const providersCollection = db.collection(
-  "providers"
-) as CollectionReference<ProviderData>;
+export const providersCollection = db.collection('providers') as CollectionReference<ProviderData>;
 
 // Получаем список студентов
 export interface Student {
-  id: number;
-  course: number;
-  spaceID: number;
-  fullName: string;
-  shortName: string;
+    id: number;
+    course: number;
+    spaceID: number;
+    fullName: string;
+    shortName: string;
 }
 export let studentList: Student[] = [];
 export let studentListLastUpdatedTimestamp: number = 0;
-sysCollection.doc("studentList").onSnapshot((snapshot) => {
-  const data = snapshot.data();
-  studentList = data?.list ?? [];
-  studentListLastUpdatedTimestamp = (data?.timestamp.seconds ?? 0) * 1000;
+sysCollection.doc('studentList').onSnapshot((snapshot) => {
+    const data = snapshot.data();
+
+    studentList = data?.list ?? [];
+    studentListLastUpdatedTimestamp = (data?.timestamp.seconds ?? 0) * 1000;
 });

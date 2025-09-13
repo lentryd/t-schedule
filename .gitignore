@@ -1,4 +1,4 @@
 .env
-/dist
+/t-schedule
 /node_modules
 /credentials.json

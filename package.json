@@ -4,9 +4,23 @@
   "version": "1.0.0",
   "description": "Бот для выгрузки расписания Т-университета",
   "scripts": {
-    "serve": "npm run build && concurrently \"tsc -w\" \"nodemon --watch dist dist/index.js\" ",
-    "start": "npm run build && node dist/index.js",
-    "build": "rimraf dist && tsc"
+    "dev": "bun --watch run ./src/index.ts",
+    "start": "bun run build && node dist/index.js",
+    "build": "bun build src/index.ts --outfile t-schedule --compile --external @google-cloud/firestore --external @googleapis/calendar",
+    "lint": "bun run lint:eslint",
+    "lint:eslint": "eslint --fix --config eslint.config.mjs 'src/**/*.{js,ts}'",
+    "format": "prettier --write .",
+    "type-check": "tsc --noEmit",
+    "lint-staged": "lint-staged",
+    "postinstall": "git config core.hooksPath .git-hooks || echo 'Не в git репозитории'"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,js}": "bun run lint:eslint",
+    "src/**/*.{ts,js,json,md}": "bun run format"
+  },
+  "source": "src/index.ts",
+  "exports": {
+    ".": "./dist/index.js"
   },
   "author": "lentryd",
   "license": "MIT",
@@ -24,13 +38,23 @@
     "telegraf": "^4.16.3"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3",
     "@types/chroma-js": "^2.4.4",
+    "@types/express": "^5.0.3",
     "@types/node": "^22.5.5",
     "@types/node-cron": "^3.0.11",
     "@types/node-fetch": "^2.6.11",
-    "concurrently": "^9.0.1",
-    "nodemon": "^3.1.4",
-    "rimraf": "^6.0.1",
+    "@typescript-eslint/eslint-plugin": "^8.20.0",
+    "@typescript-eslint/parser": "^8.20.0",
+    "eslint": "^9.25.0",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jsdoc": "^50.6.9",
+    "eslint-plugin-prettier": "^5.2.6",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-sort-keys-fix": "^1.1.2",
+    "lint-staged": "^16.0.0",
+    "prettier": "^3.5.3",
     "typescript": "^5.6.2"
   }
 }
