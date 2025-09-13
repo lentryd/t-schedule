@@ -29,7 +29,7 @@ export default async function commandStudent(ctx: CommandContext): Promise<void>
             .then((message) => messageManager(ctx, message));
     }
 
-    const student = studentList.find(({ id }) => id === studentId);
+    const student = studentList.find(({ id }) => Number(id) === studentId);
 
     if (!student) {
         return await ctx
