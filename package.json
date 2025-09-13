@@ -3,10 +3,16 @@
   "private": true,
   "version": "1.0.0",
   "description": "Бот для выгрузки расписания Т-университета",
+  "author": "lentryd",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lentryd/t-schedule.git"
+  },
   "scripts": {
     "dev": "bun --watch run ./src/index.ts",
-    "start": "bun run build && node dist/index.js",
-    "build": "bun build src/index.ts --outfile t-schedule --compile --external @google-cloud/firestore --external @googleapis/calendar",
+    "start": "bun run build && ./t-schedule",
+    "build": "bun build src/index.ts --outfile t-schedule --compile --minify --sourcemap --bytecode --external @google-cloud/firestore",
     "lint": "bun run lint:eslint",
     "lint:eslint": "eslint --fix --config eslint.config.mjs 'src/**/*.{js,ts}'",
     "format": "prettier --write .",
@@ -18,19 +24,9 @@
     "src/**/*.{ts,js}": "bun run lint:eslint",
     "src/**/*.{ts,js,json,md}": "bun run format"
   },
-  "source": "src/index.ts",
-  "exports": {
-    ".": "./dist/index.js"
-  },
-  "author": "lentryd",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/lentryd/t-schedule.git"
-  },
   "dependencies": {
-    "@google-cloud/firestore": "^7.10.0",
-    "@googleapis/calendar": "^9.7.9",
+    "@google-cloud/firestore": "^7.11.3",
+    "@googleapis/calendar": "^11.0.1",
     "chroma-js": "^3.1.1",
     "dotenv": "^16.4.5",
     "node-cron": "^3.0.3",
