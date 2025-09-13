@@ -1,6 +1,8 @@
-import { Message } from "telegraf/types";
-import { AnyContext } from "../context";
-import { SessionData } from "./database";
+import { Message } from 'telegraf/types';
+
+import { AnyContext } from '@/context';
+
+import { SessionData } from './database';
 
 /**
  * Проверяет, можно ли редактировать сообщение на основе времени создания.
@@ -8,40 +10,38 @@ import { SessionData } from "./database";
  * @param ctx - Контекст обратного вызова.
  * @returns `true`, если сообщение можно редактировать; в противном случае `false`.
  */
-export async function canEditMessage(ctx: AnyContext) {
-  const session = await ctx.session;
-  const messagesAfter = session.recentMessageIds.filter(
-    (id) => id > (ctx.callbackQuery?.message?.message_id || Infinity)
-  );
+export async function canEditMessage(ctx: AnyContext): Promise<boolean> {
+    const session = await ctx.session;
+    const messagesAfter = session.recentMessageIds.filter(
+        (id) => id > (ctx.callbackQuery?.message?.message_id || Infinity)
+    );
 
-  const currentTime = Date.now() / 1000;
-  const messageTimestamp = ctx.callbackQuery?.message?.date || 0;
-  const maxTimeDifference = 60 * 5;
+    const currentTime = Date.now() / 1000;
+    const messageTimestamp = ctx.callbackQuery?.message?.date || 0;
+    const maxTimeDifference = 60 * 5;
 
-  return (
-    currentTime - messageTimestamp < maxTimeDifference &&
-    messagesAfter.length == 0
-  );
+    return currentTime - messageTimestamp < maxTimeDifference && messagesAfter.length === 0;
 }
 
 /**
  * Удаляет сообщения после текущего
  * @param ctx - Контекст сообщения.
  */
-export async function clearMessagesAfter(ctx: AnyContext) {
-  const messageId = ctx.callbackQuery?.message?.message_id;
-  if (!messageId) return;
+export async function clearMessagesAfter(ctx: AnyContext): Promise<void> {
+    const messageId = ctx.callbackQuery?.message?.message_id;
 
-  const session = await ctx.session;
-  const index = session.recentMessageIds.indexOf(messageId);
-  if (index === -1) return;
+    if (!messageId) return;
 
-  const needCleanMessageIds = session.recentMessageIds.slice(index);
-  session.commandMessageIds = session.commandMessageIds.filter(
-    (id) => !needCleanMessageIds.includes(id)
-  );
+    const session = await ctx.session;
+    const index = session.recentMessageIds.indexOf(messageId);
 
-  return await clearMessages(ctx, needCleanMessageIds);
+    if (index === -1) return;
+
+    const needCleanMessageIds = session.recentMessageIds.slice(index);
+
+    session.commandMessageIds = session.commandMessageIds.filter((id) => !needCleanMessageIds.includes(id));
+
+    return await clearMessages(ctx, needCleanMessageIds);
 }
 
 /**
@@ -49,15 +49,10 @@ export async function clearMessagesAfter(ctx: AnyContext) {
  * @param ctx - Контекст сообщения.
  * @param message - Текстовое сообщение.
  */
-export default async function messageManager(
-  ctx: AnyContext,
-  message?: Message
-): Promise<void> {
-  const session = await ctx.session;
+export default async function messageManager(ctx: AnyContext, message?: Message): Promise<void> {
+    const session = await ctx.session;
 
-  await (message
-    ? handleSendMessage(session, message)
-    : handleNewMessage(ctx, session));
+    await (message ? handleSendMessage(session, message) : handleNewMessage(ctx, session));
 }
 
 /**
@@ -65,8 +60,8 @@ export default async function messageManager(
  * @param session - Сессия пользователя.
  * @param message - Текстовое сообщение.
  */
-async function handleSendMessage(session: SessionData, message: Message) {
-  session.recentMessageIds.push(message.message_id);
+async function handleSendMessage(session: SessionData, message: Message): Promise<void> {
+    session.recentMessageIds.push(message.message_id);
 }
 
 /**
@@ -74,24 +69,23 @@ async function handleSendMessage(session: SessionData, message: Message) {
  * @param ctx - Контекст сообщения.
  * @param session - Сессия пользователя.
  */
-async function handleNewMessage(ctx: AnyContext, session: SessionData) {
-  const isCommand = "command" in ctx && !ctx.message.via_bot;
-  if (isCommand && ctx.command === "start") {
-    session.commandMessageIds = [ctx.message.message_id];
-    await clearMessages(ctx, session.recentMessageIds);
-    session.recentMessageIds = [ctx.message.message_id];
-  } else if (isCommand) {
-    session.commandMessageIds.push(ctx.message.message_id);
-    session.recentMessageIds.push(ctx.message.message_id);
-  } else if (ctx.message) {
-    session.recentMessageIds.push(ctx.message.message_id);
-  }
+async function handleNewMessage(ctx: AnyContext, session: SessionData): Promise<void> {
+    const isCommand = 'command' in ctx && !ctx.message.via_bot;
 
-  const index = commandIndex(
-    session.commandMessageIds,
-    session.recentMessageIds
-  );
-  await clearMessages(ctx, session.recentMessageIds.slice(index));
+    if (isCommand && ctx.command === 'start') {
+        session.commandMessageIds = [ctx.message.message_id];
+        await clearMessages(ctx, session.recentMessageIds);
+        session.recentMessageIds = [ctx.message.message_id];
+    } else if (isCommand) {
+        session.commandMessageIds.push(ctx.message.message_id);
+        session.recentMessageIds.push(ctx.message.message_id);
+    } else if (ctx.message) {
+        session.recentMessageIds.push(ctx.message.message_id);
+    }
+
+    const index = commandIndex(session.commandMessageIds, session.recentMessageIds);
+
+    await clearMessages(ctx, session.recentMessageIds.slice(index));
 }
 
 /**
@@ -100,9 +94,10 @@ async function handleNewMessage(ctx: AnyContext, session: SessionData) {
  * @param recentMessageIds - Массив идентификаторов последних сообщений.
  * @returns Индекс последней команды.
  */
-function commandIndex(commandMessageIds: number[], recentMessageIds: number[]) {
-  const lastCommandMessageId = commandMessageIds[commandMessageIds.length - 1];
-  return recentMessageIds.indexOf(lastCommandMessageId) + 1;
+function commandIndex(commandMessageIds: number[], recentMessageIds: number[]): number {
+    const lastCommandMessageId = commandMessageIds[commandMessageIds.length - 1];
+
+    return recentMessageIds.indexOf(lastCommandMessageId) + 1;
 }
 
 /**
@@ -110,8 +105,8 @@ function commandIndex(commandMessageIds: number[], recentMessageIds: number[]) {
  * @param ctx - Контекст сообщения.
  * @param messageIds - Массив идентификаторов сообщений.
  */
-async function clearMessages(ctx: AnyContext, messageIds: number[]) {
-  for (const messageId of messageIds) {
-    await ctx.deleteMessage(messageId).catch(() => void 0);
-  }
+async function clearMessages(ctx: AnyContext, messageIds: number[]): Promise<void> {
+    for (const messageId of messageIds) {
+        await ctx.deleteMessage(messageId).catch(() => void 0);
+    }
 }

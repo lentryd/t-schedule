@@ -1,29 +1,26 @@
-import { Markup } from "telegraf";
-import { CallbackContext } from "../context";
-import messageManager, {
-  canEditMessage,
-  clearMessagesAfter,
-} from "../utils/messageManager";
+import { Markup } from 'telegraf';
+
+import { CallbackContext } from '@/context';
+import messageManager, { canEditMessage, clearMessagesAfter } from '@/utils/messageManager';
 
 const MESSAGE =
-  "Для настройки цветов в вашем календаре, введите адрес электронной почты, привязанный к вашему Google-аккаунту, который используется для управления календарем.";
+    'Для настройки цветов в вашем календаре, введите адрес электронной почты, привязанный к вашему Google-аккаунту, который используется для управления календарем.';
 
-export default async function callbackColorize(ctx: CallbackContext) {
-  const session = await ctx.session;
-  session.state = "set_email";
+/**
+ * Обрабатывает нажатие кнопки для настройки цветового оформления календаря.
+ */
+export default async function callbackColorize(ctx: CallbackContext): Promise<void> {
+    const session = await ctx.session;
 
-  if (await canEditMessage(ctx)) {
-    return await ctx.editMessageText(
-      MESSAGE,
-      Markup.inlineKeyboard([Markup.button.callback("Отмена", "cancel")])
-    );
-  }
+    session.state = 'set_email';
 
-  await clearMessagesAfter(ctx);
-  return await ctx
-    .reply(
-      MESSAGE,
-      Markup.inlineKeyboard([Markup.button.callback("Отмена", "cancel")])
-    )
-    .then((message) => messageManager(ctx, message));
+    if (await canEditMessage(ctx)) {
+        await ctx.editMessageText(MESSAGE, Markup.inlineKeyboard([Markup.button.callback('Отмена', 'cancel')]));
+        return;
+    }
+
+    await clearMessagesAfter(ctx);
+    await ctx
+        .reply(MESSAGE, Markup.inlineKeyboard([Markup.button.callback('Отмена', 'cancel')]))
+        .then((message) => messageManager(ctx, message));
 }

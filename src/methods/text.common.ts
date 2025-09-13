@@ -1,17 +1,24 @@
-import textEmail from "./text.email";
-import { TextContext } from "../context";
-import calendarInfo from "../messages/calendarInfo";
-import messageManager from "../utils/messageManager";
+import { TextContext } from '@/context';
+import calendarInfo from '@/messages/calendarInfo';
+import messageManager from '@/utils/messageManager';
 
-export default async function textCommon(ctx: TextContext) {
-  await messageManager(ctx);
+import textEmail from './text.email';
 
-  const session = await ctx.session;
-  switch (session.state) {
-    case "set_email":
-      return await textEmail(ctx);
+/**
+ * Обрабатывает текстовые сообщения пользователя.
+ * @param ctx TextContext
+ * @returns Promise<void>
+ */
+export default async function textCommon(ctx: TextContext): Promise<void> {
+    await messageManager(ctx);
 
-    default:
-      return calendarInfo(ctx, "Простите, я не понимаю вас. Попробуйте снова");
-  }
+    const session = await ctx.session;
+
+    switch (session.state) {
+        case 'set_email':
+            return await textEmail(ctx);
+
+        default:
+            return calendarInfo(ctx, 'Простите, я не понимаю вас. Попробуйте снова');
+    }
 }

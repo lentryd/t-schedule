@@ -1,20 +1,25 @@
-import inlineShare from "./inline.share";
-import inlineStudent from "./inline.student";
-import { InlineContext } from "../context";
+import { InlineContext } from '@/context';
 
-export default async function inlineCommon(ctx: InlineContext) {
-  if (
-    !ctx.inlineQuery.chat_type ||
-    !["sender", "private"].includes(ctx.inlineQuery.chat_type)
-  )
-    return;
+import inlineShare from './inline.share';
+import inlineStudent from './inline.student';
 
-  const session = await ctx.session;
-  switch (session.state) {
-    case "set_student":
-      return await inlineStudent(ctx);
+/**
+ * Обрабатывает inline-запросы пользователя.
+ * @param ctx InlineContext
+ * @returns Promise<void>
+ */
+export default async function inlineCommon(ctx: InlineContext): Promise<void> {
+    if (!ctx.inlineQuery.chat_type || !['sender', 'private'].includes(ctx.inlineQuery.chat_type)) return;
 
-    default:
-      return await inlineShare(ctx);
-  }
+    const session = await ctx.session;
+
+    switch (session.state) {
+        case 'set_student':
+            await inlineStudent(ctx);
+            return;
+
+        default:
+            await inlineShare(ctx);
+            return;
+    }
 }

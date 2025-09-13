@@ -1,43 +1,50 @@
-import { Markup } from "telegraf";
-import { CommandContext } from "../context";
-import messageManager from "../utils/messageManager";
+import { Markup } from 'telegraf';
 
-export default async function commandColorize(ctx: CommandContext) {
-  await messageManager(ctx);
+import { CommandContext } from '@/context';
+import messageManager from '@/utils/messageManager';
 
-  const user = await ctx.user;
-  if (!user.calendarId) {
+/**
+ * Команда для настройки цветов календаря.
+ * @param ctx Контекст команды
+ * @returns Promise<void>
+ */
+export default async function commandColorize(ctx: CommandContext): Promise<void> {
+    await messageManager(ctx);
+
+    const user = await ctx.user;
+
+    if (!user.calendarId) {
+        return await ctx
+            .reply(
+                'Эта команда предназначена для настройки цветов в вашем календаре. Однако, если у вас еще нет календаря, вы можете создать его, введя команду /student или воспользовавшись кнопкой ниже.',
+
+                Markup.inlineKeyboard([Markup.button.switchToCurrentChat('Создать календарь', '')])
+            )
+            .then((message) => messageManager(ctx, message));
+    }
+
+    const session = await ctx.session;
+
+    session.state = 'set_email';
+
+    if (user.hasEnteredEmail) {
+        return await ctx
+            .reply(
+                'Цвета в вашем календаре уже настроены. Однако, если вы хотите добавить еще одного пользователя, нажмите кнопку ниже.',
+
+                Markup.inlineKeyboard([
+                    Markup.button.callback('Добавить пользователя', 'set_email'),
+                    Markup.button.callback('Отмена', 'cancel'),
+                ])
+            )
+            .then((message) => messageManager(ctx, message));
+    }
+
     return await ctx
-      .reply(
-        "Эта команда предназначена для настройки цветов в вашем календаре. Однако, если у вас еще нет календаря, вы можете создать его, введя команду /student или воспользовавшись кнопкой ниже.",
+        .reply(
+            'Для настройки цветов в вашем календаре, введите адрес электронной почты, привязанный к вашему Google-аккаунту, который используется для управления календарем.',
 
-        Markup.inlineKeyboard([
-          Markup.button.switchToCurrentChat("Создать календарь", ""),
-        ])
-      )
-      .then((message) => messageManager(ctx, message));
-  }
-
-  const session = await ctx.session;
-  session.state = "set_email";
-  if (user.hasEnteredEmail) {
-    return await ctx
-      .reply(
-        "Цвета в вашем календаре уже настроены. Однако, если вы хотите добавить еще одного пользователя, нажмите кнопку ниже.",
-
-        Markup.inlineKeyboard([
-          Markup.button.callback("Добавить пользователя", "set_email"),
-          Markup.button.callback("Отмена", "cancel"),
-        ])
-      )
-      .then((message) => messageManager(ctx, message));
-  }
-
-  return await ctx
-    .reply(
-      "Для настройки цветов в вашем календаре, введите адрес электронной почты, привязанный к вашему Google-аккаунту, который используется для управления календарем.",
-
-      Markup.inlineKeyboard([Markup.button.callback("Отмена", "cancel")])
-    )
-    .then((message) => messageManager(ctx, message));
+            Markup.inlineKeyboard([Markup.button.callback('Отмена', 'cancel')])
+        )
+        .then((message) => messageManager(ctx, message));
 }
