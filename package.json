@@ -12,7 +12,7 @@
   "scripts": {
     "dev": "bun --watch run ./src/index.ts",
     "start": "bun run build && ./t-schedule",
-    "build": "bun build src/index.ts --outfile t-schedule --compile --minify --sourcemap --bytecode --external @google-cloud/firestore",
+    "build": "bun build src/index.ts --outfile dist/index.js --target bun --minify --external @google-cloud/firestore --external @googleapis/calendar",
     "lint": "bun run lint:eslint",
     "lint:eslint": "eslint --fix --config eslint.config.mjs 'src/**/*.{js,ts}'",
     "format": "prettier --write .",

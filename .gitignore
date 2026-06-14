@@ -2,3 +2,6 @@
 /t-schedule
 /node_modules
 /credentials.json
+/dist
+.DS_Store
+*.log

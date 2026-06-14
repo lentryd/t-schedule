@@ -1,0 +1,9 @@
+services:
+    t-schedule:
+        build: .
+        container_name: t-schedule
+        restart: always
+        env_file:
+            - .env
+        volumes:
+            - ./credentials.json:/usr/src/app/credentials.json:ro

@@ -193,7 +193,7 @@ export async function createEvent(calendarId: string, params?: DefaultEventOptio
 export async function updateEvent(
     calendarId: string,
     params?: DefaultEventOptions
-): GCalendar.GaxiosPromise<GCalendar.calendar_v3.Schema$Event> {
+): Promise<GCalendar.calendar_v3.Schema$Event> {
     // Добираем параметры по умолчанию
     params = { ...DEFAULT_EVENT_OPTIONS, ...params };
 
@@ -202,12 +202,15 @@ export async function updateEvent(
     if (!eventId) throw new Error('Event ID not found');
     delete params.id;
     delete params.etag;
+
     // Изменяем событие
-    return await calendar.events.update({
+    const res = await calendar.events.update({
         calendarId,
         eventId,
         requestBody: params,
     });
+
+    return res.data;
 }
 
 /**

@@ -4,17 +4,15 @@
     "target": "es6",
     "strict": true,
     "pretty": true,
-    "baseUrl": "./",
     "outDir": "dist",
     "rootDir": "src",
     "sourceMap": true,
     "declaration": true,
     "esModuleInterop": true,
     "strictNullChecks": true,
-    "moduleResolution": "node",
     "paths": {
       "@/*": [
-        "src/*"
+        "./src/*"
       ]
     }
   },
