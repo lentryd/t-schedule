@@ -18,6 +18,7 @@ RUN bun run build
 # Финальный образ
 FROM base AS release
 COPY --from=prerelease /usr/src/app/dist ./dist
+RUN bun install @google-cloud/firestore @googleapis/calendar
 ENV PORT=80
 EXPOSE 80
 CMD ["bun", "dist/index.js"]
